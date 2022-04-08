@@ -1,0 +1,7 @@
+dependencies {
+    implementation group: 'org.springframework', name: 'spring-core', version: '5.3.18'
+    implementation group: 'org.springframework', name: 'spring-jdbc', version: '5.3.18'
+    implementation group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
+    implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.28'
+    implementation project(':model')
+}

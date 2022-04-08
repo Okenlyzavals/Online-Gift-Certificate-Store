@@ -1,0 +1,6 @@
+rootProject.name = 'module_2'
+include 'web'
+include 'dao'
+include 'model'
+include 'service'
+
