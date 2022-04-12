@@ -1,11 +1,9 @@
 package com.epam.ems.dao;
 
-import com.epam.ems.dao.entity.Entity;
-
 import java.util.List;
 import java.util.Optional;
 
-public interface AbstractDao<T extends Entity> {
+public interface AbstractDao<T> {
 
     Optional<T> retrieveById(long id);
 

@@ -1,14 +1,14 @@
 package com.epam.ems.dao.entity;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Data
-@SuperBuilder
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class Tag extends Entity{
+@Builder
+public class Tag{
+    protected Long id;
     private String name;
 }

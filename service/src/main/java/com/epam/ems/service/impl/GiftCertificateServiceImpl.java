@@ -4,17 +4,17 @@ import com.epam.ems.dao.GiftCertificateDao;
 import com.epam.ems.dao.TagDao;
 import com.epam.ems.dao.entity.GiftCertificate;
 import com.epam.ems.dao.entity.Tag;
-import com.epam.ems.model.criteria.Criteria;
+import com.epam.ems.dao.entity.criteria.Criteria;
 import com.epam.ems.service.GiftCertificateService;
 import com.epam.ems.service.dto.GiftCertificateDto;
+import com.epam.ems.service.dto.TagDto;
 import com.epam.ems.service.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -75,8 +75,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificateDto> getByCriteria(Criteria criteria) {
-        return dao.retrieveByCriteria(criteria)
+    public List<GiftCertificateDto> getByCriteria(Map<String,String> criteria) {
+        return dao.retrieveByCriteria(mapToCriteria(criteria))
                 .stream()
                 .map(e->mapper.map(e))
                 .collect(Collectors.toList());
@@ -84,7 +84,30 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public void update(GiftCertificateDto entity) {
+
+        if(entity.getTags() != null){
+            for(TagDto tag : entity.getTags().stream()
+                                .filter(tagDto -> tagDto.getId() == null || tagDao.findByName(tagDto.getName()).isEmpty())
+                                .collect(Collectors.toList())){
+                tag.setId(tagDao.create(Tag.builder().name(tag.getName()).build()));
+            }
+        }
+
         entity.setLastUpdateDate(LocalDateTime.now());
         dao.update(mapper.extract(entity));
+    }
+
+    private Criteria mapToCriteria(Map<String,String> map){
+
+        List<String> paramNames = Arrays.stream(Criteria.ParamName.values())
+                .map(Enum::name).collect(Collectors.toList());
+
+        Criteria criteria = new Criteria();
+
+        map.entrySet().stream()
+                .filter(e->paramNames.contains(e.getKey()))
+                .peek(e-> criteria.put(Criteria.ParamName.valueOf(e.getKey()), e.getValue()));
+
+        return criteria;
     }
 }

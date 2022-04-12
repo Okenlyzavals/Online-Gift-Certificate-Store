@@ -15,14 +15,11 @@ public class Initializer implements WebApplicationInitializer {
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
         AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
-        // регистрируем конфигурацию созданую высше
         ctx.register(WebAppConfig.class);
-        // добавляем в контекст слушателя с нашей конфигурацией
         servletContext.addListener(new ContextLoaderListener(ctx));
 
         ctx.setServletContext(servletContext);
 
-        // настраиваем маппинг Dispatcher Servlet-а
         ServletRegistration.Dynamic servlet =
                 servletContext.addServlet(DISPATCHER_SERVLET_NAME, new DispatcherServlet(ctx));
         servlet.addMapping("/");

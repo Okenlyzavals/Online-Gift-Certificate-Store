@@ -2,7 +2,7 @@ package com.epam.ems.dao;
 
 import com.epam.ems.dao.entity.GiftCertificate;
 import com.epam.ems.dao.entity.Tag;
-import com.epam.ems.model.criteria.Criteria;
+import com.epam.ems.dao.entity.criteria.Criteria;
 
 import java.util.List;
 

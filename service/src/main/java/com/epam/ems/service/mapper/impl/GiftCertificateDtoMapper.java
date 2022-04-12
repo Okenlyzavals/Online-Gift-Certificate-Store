@@ -1,9 +1,10 @@
-package com.epam.ems.service.mapper;
+package com.epam.ems.service.mapper.impl;
 
 import com.epam.ems.dao.entity.GiftCertificate;
 import com.epam.ems.dao.entity.Tag;
 import com.epam.ems.service.dto.GiftCertificateDto;
 import com.epam.ems.service.dto.TagDto;
+import com.epam.ems.service.mapper.Mapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
