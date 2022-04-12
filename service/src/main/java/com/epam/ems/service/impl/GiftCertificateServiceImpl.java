@@ -8,6 +8,7 @@ import com.epam.ems.dao.entity.criteria.Criteria;
 import com.epam.ems.service.GiftCertificateService;
 import com.epam.ems.service.dto.GiftCertificateDto;
 import com.epam.ems.service.dto.TagDto;
+import com.epam.ems.service.exception.NoSuchEntityException;
 import com.epam.ems.service.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
@@ -35,11 +36,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public GiftCertificateDto getById(Long id) {
-        Optional<GiftCertificate> cert = dao.retrieveById(id);
-        if(cert.isEmpty()){
-            return null;
-        }
-        return mapper.map(cert.get());
+        return mapper.map(
+                dao.retrieveById(id)
+                .orElseThrow(()->new NoSuchEntityException(GiftCertificate.class)));
     }
 
     @Override
@@ -54,11 +53,11 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     public void insert(GiftCertificateDto entity) {
         entity.setLastUpdateDate(LocalDateTime.now());
         GiftCertificate certificate = mapper.extract(entity);
-        List<Tag> newTags = certificate.getTags()
+        List<Tag> brandNewTags = certificate.getTags()
                 .stream()
-                .filter(e-> e.getId() == null || e.getId() == 0)
+                .filter(e-> e.getId() == null || e.getId() == 0 || tagDao.findByName(e.getName()).isEmpty())
                 .collect(Collectors.toList());
-        for(Tag tag : newTags){
+        for(Tag tag : brandNewTags){
             tag.setId(tagDao.create(tag));
         }
         dao.create(certificate);
@@ -66,12 +65,15 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public void delete(Long id) {
+        if(dao.retrieveById(id).isEmpty()){
+            throw new NoSuchEntityException(GiftCertificate.class);
+        }
         dao.delete(id);
     }
 
     @Override
     public void delete(GiftCertificateDto entity) {
-        dao.delete(mapper.extract(entity));
+        delete(entity.getId());
     }
 
     @Override
@@ -84,10 +86,14 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public void update(GiftCertificateDto entity) {
+        dao.retrieveById(entity.getId())
+                .orElseThrow(()->new NoSuchEntityException(GiftCertificate.class));
 
         if(entity.getTags() != null){
             for(TagDto tag : entity.getTags().stream()
-                                .filter(tagDto -> tagDto.getId() == null || tagDao.findByName(tagDto.getName()).isEmpty())
+                                .filter(tagDto ->
+                                        (tagDto.getId() == 0)
+                                        || (tagDao.findByName(tagDto.getName()).isEmpty()))
                                 .collect(Collectors.toList())){
                 tag.setId(tagDao.create(Tag.builder().name(tag.getName()).build()));
             }

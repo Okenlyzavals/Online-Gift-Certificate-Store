@@ -12,17 +12,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.Min;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 @Validated
 @RestController
 @RequestMapping(value = "/certificates")
-@ComponentScan("com.epam.ems.service.impl")
+@ComponentScan({"com.epam.ems.service.impl", "com.epam.ems.web.exception"})
 public class GiftCertificateController {
 
     private final GiftCertificateService giftCertificateService;
@@ -49,29 +46,24 @@ public class GiftCertificateController {
     }
 
     @PostMapping(value = "/new",consumes = "application/json")
-    public ResponseEntity insert(
+    @ResponseStatus(HttpStatus.CREATED)
+    public void insert(
             @RequestBody @Validated(OnCreate.class) GiftCertificateDto toCreate){
         giftCertificateService.insert(toCreate);
-        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping(value = "/update/{id}",consumes = "application/json")
-    public ResponseEntity update(@PathVariable @Min(1) long id,
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void update(@PathVariable @Min(1) long id,
                                  @RequestBody @Validated(OnUpdate.class) GiftCertificateDto toUpdate){
         toUpdate.setId(id);
         giftCertificateService.update(toUpdate);
-        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity delete(@PathVariable @Min(1) long id){
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable @Min(1) long id){
         giftCertificateService.delete(id);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    public void constraintViolationException(HttpServletResponse response) throws IOException {
-        response.sendError(HttpStatus.BAD_REQUEST.value());
     }
 
 }

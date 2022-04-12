@@ -24,5 +24,8 @@ public class Initializer implements WebApplicationInitializer {
                 servletContext.addServlet(DISPATCHER_SERVLET_NAME, new DispatcherServlet(ctx));
         servlet.addMapping("/");
         servlet.setLoadOnStartup(1);
+        servlet.setInitParameter("throwExceptionIfNoHandlerFound", "true");
     }
+
+
 }

@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @Validated
 @RequestMapping(value = "/tags")
-@ComponentScan("com.epam.ems.service.impl")
+@ComponentScan({"com.epam.ems.service.impl", "com.epam.ems.web.exception"})
 public class TagController {
 
     private TagService tagService;
@@ -39,16 +39,15 @@ public class TagController {
     }
 
     @PostMapping(value = "/new",consumes = "application/json")
-    public ResponseEntity createTag(
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createTag(
             @Valid @RequestBody TagDto tagDto){
         tagService.insert(tagDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity deleteTag(@PathVariable("id") @Min(1L) @NotNull long id){
+    public void deleteTag(@PathVariable("id") @Min(1L) @NotNull long id){
         tagService.delete(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

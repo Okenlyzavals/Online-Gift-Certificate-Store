@@ -4,6 +4,8 @@ import com.epam.ems.dao.TagDao;
 import com.epam.ems.dao.entity.Tag;
 import com.epam.ems.service.TagService;
 import com.epam.ems.service.dto.TagDto;
+import com.epam.ems.service.exception.DuplicateEntityException;
+import com.epam.ems.service.exception.NoSuchEntityException;
 import com.epam.ems.service.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
@@ -28,11 +30,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public TagDto getById(Long id) {
-        Optional<Tag> tag = dao.retrieveById(id);
-        if(tag.isEmpty()){
-            return null;
-        }
-        return mapper.map(tag.get());
+        return mapper.map(dao.retrieveById(id).orElseThrow(() -> new NoSuchEntityException(Tag.class)));
     }
 
     @Override
@@ -47,27 +45,24 @@ public class TagServiceImpl implements TagService {
     @Override
     public void insert(TagDto entity) {
         if(dao.findByName(entity.getName()).isPresent()){
-            return;
+            throw new DuplicateEntityException(entity.getId(),Tag.class);
         }
         dao.create(mapper.extract(entity));
     }
 
     @Override
     public void delete(Long id) {
+        dao.retrieveById(id).orElseThrow(()->new NoSuchEntityException(Tag.class));
         dao.delete(id);
     }
 
     @Override
     public void delete(TagDto entity) {
-        dao.delete(mapper.extract(entity));
+        delete(entity.getId());
     }
 
     @Override
     public TagDto getByName(String name) {
-        Optional<Tag> tag = dao.findByName(name);
-        if(tag.isEmpty()){
-            return null;
-        }
-        return mapper.map(tag.get());
+        return mapper.map(dao.findByName(name).orElseThrow(() -> new NoSuchEntityException(Tag.class)));
     }
 }
