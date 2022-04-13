@@ -30,7 +30,7 @@ public class SqlTagDao implements TagDao {
     private static final String SQL_SELECT_NAME=
             SQL_SELECT + String.format(" WHERE %s=?", DBMetadata.TAG_TABLE_NAME);
     private static final String SQL_INSERT = String.format(
-            "INSERT INTO %s (%s,%s) VALUE (DEFAULT,?)",
+            "INSERT INTO %s (%s,%s) VALUES (DEFAULT,?)",
             DBMetadata.TAG_TABLE, DBMetadata.TAG_TABLE_ID,
             DBMetadata.TAG_TABLE_NAME);
     private static final String SQL_DELETE = String.format(
@@ -42,7 +42,7 @@ public class SqlTagDao implements TagDao {
     private TagRowMapper tagRowMapper;
 
     @Autowired
-    public SqlTagDao(@Qualifier(value = "mySql") DataSource dataSource, TagRowMapper rowMapper) {
+    public SqlTagDao(DataSource dataSource, TagRowMapper rowMapper) {
         template = new JdbcTemplate(dataSource);
         this.tagRowMapper = rowMapper;
     }

@@ -13,7 +13,7 @@ import javax.validation.constraints.*;
 @NoArgsConstructor
 public class TagDto implements DataTransferObject {
 
-    private long id;
+    private Long id;
 
     @NotNull
     @Length(min = 3, max = 45)

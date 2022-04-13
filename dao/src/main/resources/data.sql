@@ -1,0 +1,5 @@
+INSERT INTO `gift_certificate` VALUES (DEFAULT,'Programming book store certificate','Acquire new Java, C#, C, or C++ books to develop your programming skills.',100.00000,30,'2022-04-02 12:50:50','2022-04-06 16:16:31'),
+                                      (DEFAULT,'Alpha movie store',NULL,125.00000,7,'2022-04-02 15:19:42','2022-04-02 15:19:42'),
+                                      (DEFAULT,'Grocery store certificate','Walmart special gift certificate for yall ninjas',45.50000,21,'2022-04-06 16:25:00','2022-04-06 16:26:40');
+INSERT INTO `tag` VALUES (DEFAULT ,'Java'),(DEFAULT ,'Books'),(DEFAULT,'Programming'),(DEFAULT,'Professional'),(DEFAULT,'C language'),(DEFAULT,'C#'),(DEFAULT,'C++'),(DEFAULT,'Movies'),(DEFAULT,'TV series'),(DEFAULT,'Cartoons'),(DEFAULT,'Groceries'),(DEFAULT,'Walmart');
+INSERT INTO `certificate_has_tag` VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(2,8),(2,9),(2,10),(3,11),(3,12);

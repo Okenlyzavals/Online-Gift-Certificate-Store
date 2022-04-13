@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class CriteriaQueryBuilder{
@@ -20,9 +21,14 @@ public class CriteriaQueryBuilder{
             DBMetadata.CERTIFICATES_TABLE_ID, DBMetadata.CERT_HAS_TAG_TABLE_ID_CERT,
             DBMetadata.TAG_TABLE, DBMetadata.TAG_TABLE_ID,
             DBMetadata.CERT_HAS_TAG_TABLE_ID_TAG);
-
     private static final String GROUP_BY = String.format(
             " GROUP BY %s", DBMetadata.CERTIFICATES_TABLE_ID);
+
+    private static final  Map<Criteria.ParamName, String[]> orderTypes = Map.of(
+            Criteria.ParamName.ORDER_DATE_ASC, new String[]{"ASC",DBMetadata.CERTIFICATES_TABLE_CREATED},
+            Criteria.ParamName.ORDER_DATE_DESC, new String[]{"DESC",DBMetadata.CERTIFICATES_TABLE_CREATED},
+            Criteria.ParamName.ORDER_NAME_ASC, new String[]{"ASC",DBMetadata.CERTIFICATES_TABLE_NAME},
+            Criteria.ParamName.ORDER_NAME_DESC, new String[]{"DESC",DBMetadata.CERTIFICATES_TABLE_NAME});
 
     private final List<Object> params = new ArrayList<>();
     private final StringBuilder sqlBuilder = new StringBuilder();
@@ -73,7 +79,6 @@ public class CriteriaQueryBuilder{
                 conditionBuilder.append(" AND ");
             }
             conditionBuilder
-                    .append(" ")
                     .append(DBMetadata.TAG_TABLE_NAME)
                     .append(" LIKE ")
                     .append("?");
@@ -100,52 +105,38 @@ public class CriteriaQueryBuilder{
                 conjunction = " AND ";
                 namePart = "";
             }
-            namePart = "%"+namePart+"%";
-            descPart = "%"+descPart+"%";
 
             conditionBuilder
-                    .append(" WHERE ")
+                    .append(" WHERE ((")
                     .append(DBMetadata.CERTIFICATES_TABLE_NAME)
                     .append(" LIKE ")
                     .append("?")
+                    .append(namePart.isEmpty() ? " OR "+ DBMetadata.CERTIFICATES_TABLE_NAME + " IS NULL": "")
+                    .append(")")
                     .append(conjunction)
+                    .append("(")
                     .append(DBMetadata.CERTIFICATES_TABLE_DESC)
                     .append(" LIKE ")
-                    .append("?");
-            params.add(namePart);
-            params.add(descPart);
+                    .append("?")
+                    .append(descPart.isEmpty() ? " OR "+ DBMetadata.CERTIFICATES_TABLE_DESC + " IS NULL": "")
+                    .append("))");
+            params.add("%"+namePart+"%");
+            params.add("%"+descPart+"%");
         }
     }
 
     private void parseOrder(){
         boolean isFull = false;
-        if (criteria.containsKey(Criteria.ParamName.ORDER_DATE_ASC)){
-            orderBuilder
-                    .append(" ORDER BY ")
-                    .append(DBMetadata.CERTIFICATES_TABLE_CREATED)
-                    .append(" ASC");
-            isFull = true;
-        }
-        if (criteria.containsKey(Criteria.ParamName.ORDER_DATE_DESC)){
-            orderBuilder
-                    .append(" ORDER BY ")
-                    .append(DBMetadata.CERTIFICATES_TABLE_CREATED)
-                    .append(" DESC");
-            isFull = true;
-        }
 
-        if (criteria.containsKey(Criteria.ParamName.ORDER_NAME_ASC)){
-            orderBuilder
-                    .append(isFull ? ", " : " ORDER BY ")
-                    .append(DBMetadata.CERTIFICATES_TABLE_NAME)
-                    .append(" ASC");
-            isFull = true;
-        }
-        if (criteria.containsKey(Criteria.ParamName.ORDER_NAME_DESC)){
-            orderBuilder
-                    .append(isFull ? ", " : " ORDER BY ")
-                    .append(DBMetadata.CERTIFICATES_TABLE_NAME)
-                    .append(" DESC");
+        for(Criteria.ParamName order : criteria.keySet()){
+            if(orderTypes.containsKey(order)){
+                orderBuilder
+                        .append(isFull ? ", " : " ORDER BY ")
+                        .append(orderTypes.get(order)[1])
+                        .append(" ")
+                        .append(orderTypes.get(order)[0]);
+                isFull = true;
+            }
         }
     }
 

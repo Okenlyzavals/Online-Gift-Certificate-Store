@@ -18,10 +18,12 @@ public class GiftCertificateDtoMapper implements Mapper<GiftCertificate, GiftCer
         if(certificate == null){
             return new GiftCertificateDto();
         }
-        List<TagDto> tagDtoList = certificate.getTags()
-                .stream()
-                .map(e-> new TagDto(e.getId(), e.getName()))
-                .collect(Collectors.toList());
+        List<TagDto> tagDtoList = (certificate.getTags() != null)
+                ? certificate.getTags()
+                    .stream()
+                    .map(e-> new TagDto(e.getId(), e.getName()))
+                    .collect(Collectors.toList())
+                : null;
 
         return new GiftCertificateDto(
                 certificate.getId(),
@@ -40,6 +42,7 @@ public class GiftCertificateDtoMapper implements Mapper<GiftCertificate, GiftCer
         if(dto == null){
             return GiftCertificate.builder().build();
         }
+
         List<Tag> tags = (dto.getTags() != null)
                 ? dto.getTags().stream()
                     .map(e -> Tag.builder().id(e.getId()).name(e.getName()).build())

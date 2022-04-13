@@ -3,9 +3,10 @@ package com.epam.ems.dao.entity.criteria;
 import lombok.Getter;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 @Getter
-public class Criteria extends HashMap<Criteria.ParamName, String> {
+public class Criteria extends LinkedHashMap<Criteria.ParamName, String> {
 
     public enum ParamName{
         TAG_NAME, NAME_CONTAINS,
@@ -24,7 +25,7 @@ public class Criteria extends HashMap<Criteria.ParamName, String> {
             remove(ParamName.ORDER_DATE_ASC);
         }
         if(key == ParamName.ORDER_DATE_ASC
-                && containsKey(ParamName.ORDER_DATE_ASC)){
+                && containsKey(ParamName.ORDER_DATE_DESC)){
             remove(ParamName.ORDER_DATE_DESC);
         }
 
@@ -33,7 +34,7 @@ public class Criteria extends HashMap<Criteria.ParamName, String> {
             remove(ParamName.ORDER_NAME_ASC);
         }
         if(key == ParamName.ORDER_NAME_ASC
-                && containsKey(ParamName.ORDER_DATE_ASC)){
+                && containsKey(ParamName.ORDER_NAME_DESC)){
             remove(ParamName.ORDER_NAME_DESC);
         }
         return super.put(key, value);

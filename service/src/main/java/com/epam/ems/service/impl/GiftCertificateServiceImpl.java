@@ -53,10 +53,12 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     public void insert(GiftCertificateDto entity) {
         entity.setLastUpdateDate(LocalDateTime.now());
         GiftCertificate certificate = mapper.extract(entity);
-        List<Tag> brandNewTags = certificate.getTags()
-                .stream()
-                .filter(e-> e.getId() == null || e.getId() == 0 || tagDao.findByName(e.getName()).isEmpty())
-                .collect(Collectors.toList());
+        List<Tag> brandNewTags = (certificate.getTags() != null)
+                ? certificate.getTags()
+                    .stream()
+                    .filter(e-> e.getId() == null || e.getId() == 0 || tagDao.findByName(e.getName()).isEmpty())
+                    .collect(Collectors.toList())
+                : new ArrayList<>();
         for(Tag tag : brandNewTags){
             tag.setId(tagDao.create(tag));
         }
@@ -92,7 +94,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         if(entity.getTags() != null){
             for(TagDto tag : entity.getTags().stream()
                                 .filter(tagDto ->
-                                        (tagDto.getId() == 0)
+                                        (tagDto.getId() == null)|| (tagDto.getId()==0)
                                         || (tagDao.findByName(tagDto.getName()).isEmpty()))
                                 .collect(Collectors.toList())){
                 tag.setId(tagDao.create(Tag.builder().name(tag.getName()).build()));
@@ -109,6 +111,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                 .map(Enum::name).collect(Collectors.toList());
 
         Criteria criteria = new Criteria();
+        if(map == null){
+            return criteria;
+        }
 
         map.entrySet().stream()
                 .filter(e->paramNames.contains(e.getKey()))

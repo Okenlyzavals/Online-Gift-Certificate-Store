@@ -47,13 +47,13 @@ public class UpdateQueryBuilder {
         Map<String,Object> toUpdate = getMapOfParamsToUpdate();
         if(!toUpdate.isEmpty()){
             buildConditionsAndParams(toUpdate);
-            params.add(newCertificate.getId());
-            queries.add(String.format("UPDATE %s SET ", DBMetadata.CERTIFICATES_TABLE) +
+            params.add(oldCertificate.getId());
+            queries.add(String.format("UPDATE %s SET", DBMetadata.CERTIFICATES_TABLE) +
                             updateColumnsQuery +
                             String.format("WHERE %s=?", DBMetadata.CERTIFICATES_TABLE_ID),
                     params);
-           queries.putAll(getTagUpdateQueries());
         }
+        queries.putAll(getTagUpdateQueries());
     }
 
     private void buildConditionsAndParams(Map<String,Object> paramsToUpdate){
@@ -67,7 +67,7 @@ public class UpdateQueryBuilder {
             updateColumnsQuery
                     .append(" ")
                     .append(parameter.getKey())
-                    .append(" =?")
+                    .append("=?")
                     .append(size>1 ? ", " : " ");
             params.add(parameter.getValue());
             size--;
@@ -91,12 +91,12 @@ public class UpdateQueryBuilder {
         for(Tag tag : oldTags){
             result.add(
                     SQL_REMOVE_TAG_LINK,
-                    Arrays.asList(newCertificate.getId(),tag.getId()));
+                    Arrays.asList(oldCertificate.getId(),tag.getId()));
         }
         for(Tag tag : newTags){
             result.add(
                     SQL_CREATE_TAG_LINK,
-                    Arrays.asList(newCertificate.getId(),tag.getId()));
+                    Arrays.asList(oldCertificate.getId(),tag.getId()));
         }
         return result;
     }

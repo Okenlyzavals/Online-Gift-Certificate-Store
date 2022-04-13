@@ -20,7 +20,7 @@ import java.util.List;
 public class GiftCertificateDto implements DataTransferObject {
 
     @Min(value = 1,groups = {OnCreate.class, OnUpdate.class})
-    private long id;
+    private Long id;
 
     @Size(min=3,max=45,groups = {OnCreate.class, OnUpdate.class})
     @NotBlank(groups = OnCreate.class)

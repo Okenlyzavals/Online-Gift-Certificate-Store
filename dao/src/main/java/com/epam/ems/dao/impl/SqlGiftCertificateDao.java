@@ -62,7 +62,7 @@ public class SqlGiftCertificateDao implements GiftCertificateDao {
     private CertificateRowMapper mapper;
 
     @Autowired
-    public SqlGiftCertificateDao(@Qualifier(value = "mySql")DataSource dataSource,
+    public SqlGiftCertificateDao(DataSource dataSource,
                                  CertificateRowMapper mapper,
                                  CriteriaQueryBuilder criteriaQueryBuilder,
                                  UpdateQueryBuilder updateQueryBuilder){
