@@ -1,0 +1,37 @@
+plugins{
+    id 'java'
+}
+
+allprojects {
+
+    apply plugin:'java'
+    group 'com.epam.ems'
+    version '1.0.0'
+
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+
+    compileJava.options.encoding = 'UTF-8'
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+
+    dependencies {
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+        implementation group: 'org.springframework', name: 'spring-context', version: '5.3.18'
+        implementation group: 'org.springframework', name: 'spring-core', version: '5.3.18'
+        implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
+        implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+        implementation group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.1.0.Final'
+
+        annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+}

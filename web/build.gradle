@@ -1,0 +1,17 @@
+plugins {
+    id 'war'
+}
+
+group 'com.epam.ems'
+version '1.0.0'
+
+dependencies {
+    implementation project(':service')
+    compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+
+    implementation group: 'org.springframework', name: 'spring-web', version: '5.3.18'
+    implementation group: 'org.springframework', name: 'spring-webmvc', version: '5.3.18'
+
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.4'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'
+}
