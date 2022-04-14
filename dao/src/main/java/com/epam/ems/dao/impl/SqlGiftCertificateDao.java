@@ -16,6 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 
 import javax.sql.DataSource;
@@ -90,7 +91,9 @@ public class SqlGiftCertificateDao implements GiftCertificateDao {
     }
 
     @Override
+    @Transactional
     public Long create(GiftCertificate entity) {
+
         KeyHolder holder = new GeneratedKeyHolder();
 
         template.update(con -> {
@@ -135,6 +138,7 @@ public class SqlGiftCertificateDao implements GiftCertificateDao {
     }
 
     @Override
+    @Transactional
     public void update(GiftCertificate entity) {
 
         GiftCertificate oldCertificate = retrieveById(entity.getId()).get();

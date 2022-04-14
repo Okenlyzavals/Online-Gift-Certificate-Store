@@ -35,7 +35,7 @@ public class GiftCertificateController {
     }
 
     @GetMapping("/{id}")
-    public GiftCertificateDto getCertificate(@PathVariable @Min(1) long id){
+    public GiftCertificateDto getCertificate(@PathVariable @Min(value = 1, message = "msg.id.negative") long id){
         return giftCertificateService.getById(id);
     }
 
@@ -45,24 +45,24 @@ public class GiftCertificateController {
         return giftCertificateService.getByCriteria(criteria);
     }
 
-    @PostMapping(value = "/new",consumes = "application/json")
+    @PostMapping(consumes = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
     public void insert(
             @RequestBody @Validated(OnCreate.class) GiftCertificateDto toCreate){
         giftCertificateService.insert(toCreate);
     }
 
-    @PutMapping(value = "/update/{id}",consumes = "application/json")
+    @PutMapping(value = "/{id}",consumes = "application/json")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void update(@PathVariable @Min(1) long id,
+    public void update(@PathVariable @Min(value = 1, message = "msg.id.negative") long id,
                                  @RequestBody @Validated(OnUpdate.class) GiftCertificateDto toUpdate){
         toUpdate.setId(id);
         giftCertificateService.update(toUpdate);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable @Min(1) long id){
+    public void delete(@PathVariable @Min(value = 1, message = "msg.id.negative") long id){
         giftCertificateService.delete(id);
     }
 

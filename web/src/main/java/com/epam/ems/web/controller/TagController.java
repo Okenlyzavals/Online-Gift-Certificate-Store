@@ -34,19 +34,19 @@ public class TagController {
     }
 
     @GetMapping("/{id}")
-    public TagDto getTagById(@PathVariable("id") @Min(1L) @NotNull long id){
+    public TagDto getTagById(@PathVariable("id") @Min(value = 1, message = "msg.id.negative") long id){
         return tagService.getById(id);
     }
 
-    @PostMapping(value = "/new",consumes = "application/json")
+    @PostMapping(consumes = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
     public void createTag(
             @Valid @RequestBody TagDto tagDto){
         tagService.insert(tagDto);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public void deleteTag(@PathVariable("id") @Min(1L) @NotNull long id){
+    @DeleteMapping("/{id}")
+    public void deleteTag(@PathVariable("id") @Min(value = 1, message = "msg.id.negative") long id){
         tagService.delete(id);
     }
 

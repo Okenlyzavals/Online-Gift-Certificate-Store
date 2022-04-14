@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 @Target( { ElementType.PARAMETER, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CriteriaConstraint {
-    String message() default "Invalid criteria";
+    String message() default "msg.criteria.invalid";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
