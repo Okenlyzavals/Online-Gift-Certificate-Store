@@ -15,7 +15,7 @@ public class TagDto implements DataTransferObject {
 
     private Long id;
 
-    @NotNull
-    @Length(min = 3, max = 45)
+    @NotNull(message = "msg.tag.name.empty")
+    @Length(min = 1, max = 45, message = "msg.tag.name.len.wrong")
     private String name;
 }
