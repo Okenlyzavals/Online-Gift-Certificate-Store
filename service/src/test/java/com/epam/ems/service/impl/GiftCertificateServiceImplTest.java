@@ -6,7 +6,6 @@ import com.epam.ems.dao.entity.GiftCertificate;
 import com.epam.ems.dao.entity.Tag;
 import com.epam.ems.service.dto.GiftCertificateDto;
 import com.epam.ems.service.dto.TagDto;
-import com.epam.ems.service.exception.DuplicateEntityException;
 import com.epam.ems.service.exception.NoSuchEntityException;
 import com.epam.ems.service.mapper.impl.GiftCertificateDtoMapper;
 import org.junit.jupiter.api.Test;

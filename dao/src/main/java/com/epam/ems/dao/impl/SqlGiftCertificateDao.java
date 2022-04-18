@@ -1,6 +1,7 @@
 package com.epam.ems.dao.impl;
 
 import com.epam.ems.dao.GiftCertificateDao;
+import com.epam.ems.dao.TagDao;
 import com.epam.ems.dao.constant.DBMetadata;
 import com.epam.ems.dao.entity.GiftCertificate;
 import com.epam.ems.dao.entity.Tag;
@@ -24,6 +25,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 @ComponentScan({"com.epam.ems.dao"})
@@ -43,14 +45,6 @@ public class SqlGiftCertificateDao implements GiftCertificateDao {
             DBMetadata.CERTIFICATES_TABLE_CREATED, DBMetadata.CERTIFICATES_TABLE_LAST_UPDATE);
     private static final String SQL_DELETE = String.format("DELETE FROM %s WHERE %s=?",
             DBMetadata.CERTIFICATES_TABLE, DBMetadata.CERTIFICATES_TABLE_ID);
-
-    private static final String SQL_SELECT_TAGS = String.format(
-            "SELECT * FROM %s " +
-            "LEFT JOIN %s " +
-            "ON %s=%s WHERE %s=?",
-            DBMetadata.CERT_HAS_TAG_TABLE, DBMetadata.TAG_TABLE,
-            DBMetadata.TAG_TABLE_ID, DBMetadata.CERT_HAS_TAG_TABLE_ID_TAG,
-            DBMetadata.CERT_HAS_TAG_TABLE_ID_CERT);
     private static final String SQL_CREATE_TAG_LINK = String.format(
             "INSERT INTO %s (%s,%s) VAlUES(?,?)",
             DBMetadata.CERT_HAS_TAG_TABLE, DBMetadata.CERT_HAS_TAG_TABLE_ID_CERT,
@@ -60,24 +54,28 @@ public class SqlGiftCertificateDao implements GiftCertificateDao {
     private final JdbcTemplate template;
     private final CriteriaQueryBuilder criteriaQueryBuilder;
     private final UpdateQueryBuilder updateQueryBuilder;
-    private CertificateRowMapper mapper;
+    private final CertificateRowMapper mapper;
+    private final TagDao tagDao;
 
     @Autowired
     public SqlGiftCertificateDao(DataSource dataSource,
                                  CertificateRowMapper mapper,
                                  CriteriaQueryBuilder criteriaQueryBuilder,
-                                 UpdateQueryBuilder updateQueryBuilder){
+                                 UpdateQueryBuilder updateQueryBuilder,
+                                 TagDao tagDao){
         template = new JdbcTemplate(dataSource);
         this.criteriaQueryBuilder = criteriaQueryBuilder;
         this.updateQueryBuilder = updateQueryBuilder;
         this.mapper = mapper;
+        this.tagDao = tagDao;
     }
 
     @Override
     public Optional<GiftCertificate> retrieveById(long id) {
         Optional<GiftCertificate> certificate =
                 template.query(SQL_SELECT_ID, mapper, id).stream().findAny();
-        certificate.ifPresent(giftCertificate -> giftCertificate.setTags(retrieveTags(id)));
+        certificate.ifPresent(giftCertificate
+                -> giftCertificate.setTags(tagDao.retrieveTagsByCertificateId(id)));
         return certificate;
     }
 
@@ -85,7 +83,7 @@ public class SqlGiftCertificateDao implements GiftCertificateDao {
     public List<GiftCertificate> retrieveAll() {
         List<GiftCertificate> certs = template.query(SQL_SELECT, mapper);
         for(GiftCertificate certificate : certs){
-            certificate.setTags(retrieveTags(certificate.getId()));
+            certificate.setTags(tagDao.retrieveTagsByCertificateId(certificate.getId()));
         }
         return certs;
     }
@@ -107,9 +105,8 @@ public class SqlGiftCertificateDao implements GiftCertificateDao {
             return statement;
         },holder);
         Long key = holder.getKey().longValue();
-        for(Tag tag : entity.getTags()){
-            template.update(SQL_CREATE_TAG_LINK, key, tag.getId());
-        }
+        insertBrandNewTags(entity.getTags());
+        createTagLink(key, entity.getTags());
         return key;
     }
 
@@ -131,28 +128,41 @@ public class SqlGiftCertificateDao implements GiftCertificateDao {
                         criteriaQueryBuilder.getQuery(),
                         mapper,
                         criteriaQueryBuilder.getParams());
-        for(GiftCertificate certificate : certs){
-            certificate.setTags(retrieveTags(certificate.getId()));
-        }
+        certs.forEach(c->c.setTags(tagDao.retrieveTagsByCertificateId(c.getId())));
+
         return certs;
     }
 
     @Override
     @Transactional
     public void update(GiftCertificate entity) {
-
         GiftCertificate oldCertificate = retrieveById(entity.getId()).get();
+        insertBrandNewTags(entity.getTags());
         MultiValueMap<String, List<Object>> queries = updateQueryBuilder.parse(entity, oldCertificate);
-        for(String key : queries.keySet()){
-            for(List<Object> params : queries.get(key)){
-                template.update(key, params.toArray());
-            }
+        for(String query : queries.keySet()){
+            performUpdateQueries(query, queries.get(query));
         }
     }
 
-    @Override
-    public List<Tag> retrieveTags(long id){
-        return template.query(SQL_SELECT_TAGS, new TagRowMapper(), id);
+    private void performUpdateQueries(String query, List<List<Object>> parameterLists){
+        for(List<Object> parameters : parameterLists){
+            template.update(query, parameters.toArray());
+        }
+    }
+
+    private void createTagLink(Long certId, List<Tag> tags){
+        for(Tag tag : tags){
+            template.update(SQL_CREATE_TAG_LINK, certId, tag.getId());
+        }
+    }
+
+    private void insertBrandNewTags(List<Tag> tags){
+        if(tags == null){
+            return;
+        }
+        tags.stream()
+                .filter(t-> t.getId() == null || t.getId() < 1 || tagDao.findByName(t.getName()).isEmpty())
+                .forEach(t->t.setId(tagDao.create(t)));
     }
 
 }

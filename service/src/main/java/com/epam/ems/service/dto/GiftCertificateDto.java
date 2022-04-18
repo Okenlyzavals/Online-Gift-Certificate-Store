@@ -46,5 +46,5 @@ public class GiftCertificateDto implements DataTransferObject {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm'Z'")
     private LocalDateTime lastUpdateDate;
 
-    private @Valid List<TagDto> tags;
+    private List<@Valid TagDto> tags;
 }

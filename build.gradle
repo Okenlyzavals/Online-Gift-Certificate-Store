@@ -25,9 +25,6 @@ allprojects {
         implementation group: 'org.springframework', name: 'spring-context', version: '5.3.18'
         implementation group: 'org.springframework', name: 'spring-core', version: '5.3.18'
         implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
-        implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
-        implementation group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.1.0.Final'
-
         annotationProcessor 'org.projectlombok:lombok:1.18.22'
     }
 

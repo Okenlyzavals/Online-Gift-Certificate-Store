@@ -24,7 +24,7 @@ public class UpdateQueryBuilder {
     private final MultiValueMap<String, List<Object>> queries = new LinkedMultiValueMap<>();
     private final StringBuilder updateColumnsQuery = new StringBuilder();
     private final List<Object> params = new ArrayList<>();
-    private GiftCertificate newCertificate;
+    private GiftCertificate updatedCertificate;
     private GiftCertificate oldCertificate;
 
     public MultiValueMap<String, List<Object>> parse(GiftCertificate newCertificate, GiftCertificate oldCertificate){
@@ -36,7 +36,7 @@ public class UpdateQueryBuilder {
         queries.clear();
         updateColumnsQuery.setLength(0);
 
-        this.newCertificate = newCertificate;
+        this.updatedCertificate = newCertificate;
         this.oldCertificate = oldCertificate;
 
         buildQueries();
@@ -77,23 +77,43 @@ public class UpdateQueryBuilder {
     private MultiValueMap<String, List<Object>> getTagUpdateQueries(){
         MultiValueMap<String, List<Object>> result = new LinkedMultiValueMap<>();
 
-        if(newCertificate.getTags() == null){
+        if(updatedCertificate.getTags() == null){
             return result;
         }
-        HashSet<Tag> oldTags = new HashSet<>(oldCertificate.getTags());
-        HashSet<Tag> newTags = new HashSet<>(newCertificate.getTags());
 
-        HashSet<Tag> temp = new HashSet<>(oldTags);
+        Set<Tag> oldTags = new HashSet<>(oldCertificate.getTags());
+        Set<Tag> updatedTags = new HashSet<>(updatedCertificate.getTags());
 
-        temp.retainAll(newTags);
-        oldTags.removeAll(temp);
-        newTags.removeAll(temp);
-        for(Tag tag : oldTags){
+        Set<Tag> commonTags = getCommonTags(oldTags, updatedTags);
+
+        oldTags.removeAll(commonTags);
+        updatedTags.removeAll(commonTags);
+
+        result.addAll(getQueriesForRemovalOfUnusedTagLinks(oldTags));
+        result.addAll(getQueriesForAdditionOfNewTagLinks(updatedTags));
+        return result;
+    }
+
+    private Set<Tag> getCommonTags(Set<Tag> oldTags, Set<Tag> newTags){
+        Set<Tag> commonTags = new HashSet<>(oldTags);
+        commonTags.retainAll(newTags);
+
+        return commonTags;
+    }
+
+    private MultiValueMap<String, List<Object>> getQueriesForRemovalOfUnusedTagLinks(Set<Tag> unusedTags){
+        MultiValueMap<String, List<Object>> result = new LinkedMultiValueMap<>();
+        for(Tag tag : unusedTags){
             result.add(
                     SQL_REMOVE_TAG_LINK,
                     Arrays.asList(oldCertificate.getId(),tag.getId()));
         }
-        for(Tag tag : newTags){
+        return result;
+    }
+
+    private MultiValueMap<String, List<Object>> getQueriesForAdditionOfNewTagLinks(Set<Tag> addedTags){
+        MultiValueMap<String, List<Object>> result = new LinkedMultiValueMap<>();
+        for(Tag tag : addedTags){
             result.add(
                     SQL_CREATE_TAG_LINK,
                     Arrays.asList(oldCertificate.getId(),tag.getId()));
@@ -103,7 +123,7 @@ public class UpdateQueryBuilder {
 
     private Map<String,Object> getMapOfParamsToUpdate(){
         Map<String,Object> oldParams = getMapOfFields(oldCertificate);
-        Map<String,Object> newParams = getMapOfFields(newCertificate);
+        Map<String,Object> newParams = getMapOfFields(updatedCertificate);
 
         newParams.entrySet().removeAll(oldParams.entrySet());
         newParams.entrySet().removeIf(e-> e.getValue() == null);

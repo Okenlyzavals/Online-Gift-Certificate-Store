@@ -2,7 +2,6 @@ package com.epam.ems.service.impl;
 
 import com.epam.ems.dao.TagDao;
 import com.epam.ems.dao.entity.Tag;
-import com.epam.ems.dao.impl.SqlTagDao;
 import com.epam.ems.service.dto.TagDto;
 import com.epam.ems.service.exception.DuplicateEntityException;
 import com.epam.ems.service.exception.NoSuchEntityException;

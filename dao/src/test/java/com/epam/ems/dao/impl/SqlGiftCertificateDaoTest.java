@@ -8,6 +8,7 @@ import com.epam.ems.dao.querybuilder.CriteriaQueryBuilder;
 import com.epam.ems.dao.querybuilder.UpdateQueryBuilder;
 import com.epam.ems.dao.querybuilder.UpdateQueryBuilderTest;
 import com.epam.ems.dao.rowmapper.CertificateRowMapper;
+import com.epam.ems.dao.rowmapper.TagRowMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataAccessException;
@@ -31,6 +32,9 @@ public class SqlGiftCertificateDaoTest {
     private CertificateRowMapper rowMapper;
     private UpdateQueryBuilder updateBuilder;
     private CriteriaQueryBuilder criteriaBuilder;
+
+    private SqlTagDao tagDao;
+    private TagRowMapper tagRowMapper;
 
     private DataSource dataSource;
     private JdbcTemplate template;
@@ -77,7 +81,8 @@ public class SqlGiftCertificateDaoTest {
         criteriaBuilder = new CriteriaQueryBuilder();
 
         dataSource = new H2DbConfig().h2DataSource();
-        certDao = new SqlGiftCertificateDao(dataSource, rowMapper, criteriaBuilder, updateBuilder);
+        tagDao = new SqlTagDao(dataSource, tagRowMapper);
+        certDao = new SqlGiftCertificateDao(dataSource, rowMapper, criteriaBuilder, updateBuilder,tagDao);
         template = new JdbcTemplate(dataSource);
     }
 
@@ -249,7 +254,7 @@ public class SqlGiftCertificateDaoTest {
     @Test
     void  testRetrieveTagsFromCertById(){
         List<Tag> expected = List.of(new Tag(11L,"Groceries"),new Tag(12L,"Walmart"));
-        List<Tag> actual = certDao.retrieveTags(3L);
+        List<Tag> actual = tagDao.retrieveTagsByCertificateId(3L);
 
         assertEquals(expected, actual);
 

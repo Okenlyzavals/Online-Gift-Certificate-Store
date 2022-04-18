@@ -104,7 +104,6 @@ public class GiftCertificateExceptionHandler extends ResponseEntityExceptionHand
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
         Locale locale = request.getLocale();
-        ex.printStackTrace();
         return new ResponseEntity<>(
                 new ApiErrorResponse(
                         HttpStatus.INTERNAL_SERVER_ERROR.value(),

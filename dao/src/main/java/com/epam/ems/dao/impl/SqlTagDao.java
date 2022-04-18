@@ -29,6 +29,13 @@ public class SqlTagDao implements TagDao {
             SQL_SELECT + String.format(" WHERE %s=?", DBMetadata.TAG_TABLE_ID);
     private static final String SQL_SELECT_NAME=
             SQL_SELECT + String.format(" WHERE %s=?", DBMetadata.TAG_TABLE_NAME);
+    private static final String SQL_SELECT_BY_CERTIFICATE = String.format(
+            "SELECT * FROM %s " +
+                    "LEFT JOIN %s " +
+                    "ON %s=%s WHERE %s=?",
+            DBMetadata.CERT_HAS_TAG_TABLE, DBMetadata.TAG_TABLE,
+            DBMetadata.TAG_TABLE_ID, DBMetadata.CERT_HAS_TAG_TABLE_ID_TAG,
+            DBMetadata.CERT_HAS_TAG_TABLE_ID_CERT);
     private static final String SQL_INSERT = String.format(
             "INSERT INTO %s (%s,%s) VALUES (DEFAULT,?)",
             DBMetadata.TAG_TABLE, DBMetadata.TAG_TABLE_ID,
@@ -39,7 +46,7 @@ public class SqlTagDao implements TagDao {
 
 
     private final JdbcTemplate template;
-    private TagRowMapper tagRowMapper;
+    private final TagRowMapper tagRowMapper;
 
     @Autowired
     public SqlTagDao(DataSource dataSource, TagRowMapper rowMapper) {
@@ -84,5 +91,10 @@ public class SqlTagDao implements TagDao {
     @Override
     public Optional<Tag> findByName(String name) {
         return template.query(SQL_SELECT_NAME, tagRowMapper, name).stream().findAny();
+    }
+
+    @Override
+    public List<Tag> retrieveTagsByCertificateId(Long certificateId) {
+        return template.query(SQL_SELECT_BY_CERTIFICATE, tagRowMapper, certificateId);
     }
 }
