@@ -75,7 +75,7 @@ public class GiftCertificateController {
     @PostMapping(consumes = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
     public void insert(
-            @RequestBody @Validated(OnCreate.class) GiftCertificateDto toCreate){
+            @RequestBody @Validated({OnCreate.class}) GiftCertificateDto toCreate){
         giftCertificateService.insert(toCreate);
     }
 

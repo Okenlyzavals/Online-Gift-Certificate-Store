@@ -3,10 +3,12 @@ package com.epam.ems.service.dto;
 
 import com.epam.ems.service.validation.OnCreate;
 import com.epam.ems.service.validation.OnUpdate;
+import com.epam.ems.service.validation.custom.TagDtoListConstraint;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -46,5 +48,7 @@ public class GiftCertificateDto implements DataTransferObject {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm'Z'")
     private LocalDateTime lastUpdateDate;
 
-    private List<@Valid TagDto> tags;
+    @NotNull(groups = OnCreate.class, message = "msg.taglist.null")
+    @TagDtoListConstraint(groups = {OnCreate.class,OnUpdate.class})
+    private List<TagDto> tags;
 }

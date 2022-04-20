@@ -76,6 +76,7 @@ public class SqlGiftCertificateDaoTest {
 
     @BeforeEach
     void initDatabase(){
+        tagRowMapper = new TagRowMapper();
         rowMapper = new CertificateRowMapper();
         updateBuilder = new UpdateQueryBuilder();
         criteriaBuilder = new CriteriaQueryBuilder();

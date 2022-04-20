@@ -74,7 +74,7 @@ public class GiftCertificateExceptionHandler extends ResponseEntityExceptionHand
 
     @ExceptionHandler({ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiErrorResponse validationFail(ConstraintViolationException e, WebRequest request){
+    public ApiErrorResponse pathVariableValidationFail(ConstraintViolationException e, WebRequest request){
         Locale locale = request.getLocale();
 
         List<String> violationMessages= e.getConstraintViolations().stream().map(ConstraintViolation::getMessage).collect(Collectors.toList());
@@ -83,7 +83,6 @@ public class GiftCertificateExceptionHandler extends ResponseEntityExceptionHand
         errorMessage.append(getLocalizedMessage(MESSAGE_INVALID_ENTITY, locale)).append(":");
 
         violationMessages.forEach(o-> errorMessage.append(" ").append(getLocalizedMessage(o, locale)).append(";"));
-
 
         return new ApiErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),

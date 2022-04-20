@@ -14,4 +14,5 @@ public class WebAppConfig {
     public MethodValidationPostProcessor methodValidationPostProcessor() {
         return new MethodValidationPostProcessor();
     }
+
 }
