@@ -22,14 +22,12 @@ import java.util.stream.Collectors;
 public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     private GiftCertificateDao dao;
-    private TagDao tagDao;
     private Mapper<GiftCertificate, GiftCertificateDto> mapper;
 
     @Autowired
-    public GiftCertificateServiceImpl(GiftCertificateDao dao, TagDao tagDao,
+    public GiftCertificateServiceImpl(GiftCertificateDao dao,
                                       Mapper<GiftCertificate, GiftCertificateDto> mapper) {
         this.dao = dao;
-        this.tagDao = tagDao;
         this.mapper = mapper;
     }
 
@@ -49,10 +47,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public void insert(GiftCertificateDto entity){
+    public GiftCertificateDto insert(GiftCertificateDto entity){
         entity.setLastUpdateDate(LocalDateTime.now());
-        GiftCertificate certificate = mapper.extract(entity);
-        dao.create(certificate);
+        return mapper.map(dao.create(mapper.extract(entity)));
     }
 
     @Override
@@ -77,12 +74,12 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public void update(GiftCertificateDto entity) throws NoSuchEntityException {
+    public GiftCertificateDto update(GiftCertificateDto entity) throws NoSuchEntityException {
         dao.retrieveById(entity.getId())
                 .orElseThrow(()->new NoSuchEntityException(GiftCertificate.class));
 
         entity.setLastUpdateDate(LocalDateTime.now());
-        dao.update(mapper.extract(entity));
+        return mapper.map(dao.update(mapper.extract(entity)));
     }
 
     private Criteria mapToCriteria(Map<String,String> map){

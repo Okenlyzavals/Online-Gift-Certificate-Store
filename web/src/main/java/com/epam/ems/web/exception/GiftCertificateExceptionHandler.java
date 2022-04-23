@@ -48,7 +48,7 @@ public class GiftCertificateExceptionHandler extends ResponseEntityExceptionHand
         Locale locale = request.getLocale();
         return new ApiErrorResponse(
                 e.getErrorCode(),
-                getLocalizedMessage(MESSAGE_DUPLICATE+"(id="+e.getId()+")", locale));
+                getLocalizedMessage(MESSAGE_DUPLICATE, locale)+"(id="+e.getId()+")");
     }
 
     @Override

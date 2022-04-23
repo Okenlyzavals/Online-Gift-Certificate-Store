@@ -9,10 +9,12 @@ import com.epam.ems.service.validation.custom.CriteriaConstraint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 
@@ -64,7 +66,9 @@ public class GiftCertificateController {
      */
     @GetMapping("/by_criteria")
     public List<GiftCertificateDto> getCertificatesByCriteria(
-            @RequestBody @CriteriaConstraint Map<String,String> criteria){
+            @RequestBody
+            @NotNull(message = "msg.dto.null")
+            @CriteriaConstraint Map<String,String> criteria){
         return giftCertificateService.getByCriteria(criteria);
     }
 
@@ -72,11 +76,14 @@ public class GiftCertificateController {
      * Creates new gift certificate in data source
      * @param toCreate {@link GiftCertificateDto} to create
      */
-    @PostMapping(consumes = "application/json")
+    @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
-    public void insert(
-            @RequestBody @Validated({OnCreate.class}) GiftCertificateDto toCreate){
-        giftCertificateService.insert(toCreate);
+    public GiftCertificateDto insert(
+            @RequestBody
+            @NotNull(message = "msg.dto.null")
+            @Validated({OnCreate.class})
+                    GiftCertificateDto toCreate){
+        return giftCertificateService.insert(toCreate);
     }
 
     /**
@@ -85,13 +92,17 @@ public class GiftCertificateController {
      * @param toUpdate Entity to update, wrapped in {@link GiftCertificateDto}
      * @throws NoSuchEntityException if there is no such entity in Data Source.
      */
-    @PutMapping(value = "/{id}",consumes = "application/json")
+    @PatchMapping(value = "/{id}",
+            consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void update(@PathVariable @Min(value = 1, message = "msg.id.negative") long id,
-                                 @RequestBody @Validated(OnUpdate.class) GiftCertificateDto toUpdate)
+    public GiftCertificateDto update(@PathVariable @Min(value = 1, message = "msg.id.negative") long id,
+                                 @RequestBody
+                                 @NotNull(message = "msg.dto.null")
+                                 @Validated(OnUpdate.class)
+                                         GiftCertificateDto toUpdate)
             throws NoSuchEntityException{
         toUpdate.setId(id);
-        giftCertificateService.update(toUpdate);
+        return giftCertificateService.update(toUpdate);
     }
 
     /**

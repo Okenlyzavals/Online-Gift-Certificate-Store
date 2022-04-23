@@ -30,6 +30,6 @@ public interface GiftCertificateService extends AbstractService<GiftCertificateD
      * @param entity Entity to update, wrapped in {@link GiftCertificateDto}
      * @throws NoSuchEntityException if there is no such entity in Data Source.
      */
-    void update(GiftCertificateDto entity) throws NoSuchEntityException;
+    GiftCertificateDto update(GiftCertificateDto entity) throws NoSuchEntityException;
 
 }

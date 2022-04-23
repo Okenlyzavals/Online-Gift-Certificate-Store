@@ -12,6 +12,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,11 +44,23 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public void insert(TagDto entity) throws DuplicateEntityException {
-        if(dao.findByName(entity.getName()).isPresent()){
-            throw new DuplicateEntityException(entity.getId(),Tag.class);
+    public TagDto insert(TagDto entity) throws DuplicateEntityException {
+        findDuplicate(entity).ifPresent(d->{
+            throw new DuplicateEntityException(d.getId(), Tag.class);
+        });
+        return mapper.map(dao.create(mapper.extract(entity)));
+    }
+
+    private Optional<Tag> findDuplicate(TagDto entity){
+        Optional<Tag> duplicate;
+
+        duplicate = dao.findByName(entity.getName());
+        if(duplicate.isPresent()){
+            return duplicate;
         }
-        dao.create(mapper.extract(entity));
+
+        duplicate = dao.retrieveById(entity.getId());
+        return duplicate;
     }
 
     @Override

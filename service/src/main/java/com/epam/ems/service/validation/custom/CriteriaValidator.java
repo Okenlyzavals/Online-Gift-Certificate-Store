@@ -15,11 +15,6 @@ public class CriteriaValidator implements ConstraintValidator<CriteriaConstraint
 
     @Override
     public boolean isValid(Map<String, String> value, ConstraintValidatorContext context) {
-
-        if(value == null){
-            return false;
-        }
-
         return CRITERIA_PARAM_NAMES.containsAll(value.keySet());
     }
 }

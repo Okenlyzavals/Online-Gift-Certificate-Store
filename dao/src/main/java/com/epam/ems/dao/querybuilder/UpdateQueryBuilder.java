@@ -4,6 +4,7 @@ import com.epam.ems.dao.constant.DBMetadata;
 import com.epam.ems.dao.entity.GiftCertificate;
 import com.epam.ems.dao.entity.Tag;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -13,65 +14,83 @@ import java.util.*;
 @Component
 public class UpdateQueryBuilder {
     private static final String SQL_CREATE_TAG_LINK = String.format(
-            "INSERT INTO %s (%s,%s) VAlUES(?,?)",
+            "INSERT INTO %s (%s,%s) VAlUES",
             DBMetadata.CERT_HAS_TAG_TABLE, DBMetadata.CERT_HAS_TAG_TABLE_ID_CERT,
             DBMetadata.CERT_HAS_TAG_TABLE_ID_TAG);
     private static final String SQL_REMOVE_TAG_LINK = String.format(
-            "DELETE FROM %s WHERE %s=? AND %s=?",
-            DBMetadata.CERT_HAS_TAG_TABLE, DBMetadata.CERT_HAS_TAG_TABLE_ID_CERT,
-            DBMetadata.CERT_HAS_TAG_TABLE_ID_TAG);
+            "DELETE FROM %s WHERE ",
+            DBMetadata.CERT_HAS_TAG_TABLE);
 
     private final MultiValueMap<String, List<Object>> queries = new LinkedMultiValueMap<>();
-    private final StringBuilder updateColumnsQuery = new StringBuilder();
-    private final List<Object> params = new ArrayList<>();
+    private final List<Object> totalParams = new ArrayList<>();
+    private final StringBuilder fullQuery = new StringBuilder();
     private GiftCertificate updatedCertificate;
     private GiftCertificate oldCertificate;
 
-    public MultiValueMap<String, List<Object>> parse(GiftCertificate newCertificate, GiftCertificate oldCertificate){
-        if(oldCertificate == null || newCertificate == null){
-            return new LinkedMultiValueMap<>();
-        }
+    public void parse(GiftCertificate newCertificate, GiftCertificate oldCertificate){
 
-        params.clear();
+        totalParams.clear();
         queries.clear();
-        updateColumnsQuery.setLength(0);
+        fullQuery.setLength(0);
 
         this.updatedCertificate = newCertificate;
         this.oldCertificate = oldCertificate;
 
+        if(oldCertificate == null || newCertificate == null){
+            return;
+        }
         buildQueries();
-        return queries;
+        for(String query : queries.keySet()){
+            appendQueriesAndParameters(query);
+        }
+    }
+
+    private void appendQueriesAndParameters(String query){
+        for(List<Object> parameters : queries.get(query)){
+            fullQuery.append(query).append(";\n ");
+            totalParams.addAll(parameters);
+        }
+    }
+
+    public Object[] getParams() {
+        return totalParams.toArray();
+    }
+
+    public String getQuery() {
+        return fullQuery.toString();
     }
 
     private void buildQueries(){
+        List<Object> params = new ArrayList<>();
         Map<String,Object> toUpdate = getMapOfParamsToUpdate();
         if(!toUpdate.isEmpty()){
-            buildConditionsAndParams(toUpdate);
+            String conditions = buildConditionsAndParams(toUpdate, params);
             params.add(oldCertificate.getId());
             queries.add(String.format("UPDATE %s SET", DBMetadata.CERTIFICATES_TABLE) +
-                            updateColumnsQuery +
+                            conditions +
                             String.format("WHERE %s=?", DBMetadata.CERTIFICATES_TABLE_ID),
                     params);
         }
         queries.putAll(getTagUpdateQueries());
     }
 
-    private void buildConditionsAndParams(Map<String,Object> paramsToUpdate){
-        int size = paramsToUpdate.entrySet().size();
+    private String buildConditionsAndParams(Map<String,Object> paramsToUpdate, List<Object> params){
+        int paramsLeft = paramsToUpdate.entrySet().size();
         String newDesc = (String) paramsToUpdate.get(DBMetadata.CERTIFICATES_TABLE_DESC);
         if(newDesc != null
                 && (newDesc.equalsIgnoreCase("null") || newDesc.isBlank())){
             paramsToUpdate.replace(DBMetadata.CERTIFICATES_TABLE_DESC, null);
         }
+        StringBuilder updateColumnsQuery = new StringBuilder();
         for(Map.Entry<String,Object> parameter : paramsToUpdate.entrySet()){
             updateColumnsQuery
                     .append(" ")
                     .append(parameter.getKey())
                     .append("=?")
-                    .append(size>1 ? ", " : " ");
+                    .append(paramsLeft-- > 1 ? ", " : " ");
             params.add(parameter.getValue());
-            size--;
         }
+        return updateColumnsQuery.toString();
     }
 
     private MultiValueMap<String, List<Object>> getTagUpdateQueries(){
@@ -81,42 +100,57 @@ public class UpdateQueryBuilder {
             return result;
         }
 
-        Set<Tag> oldTags = new HashSet<>(oldCertificate.getTags());
-        Set<Tag> updatedTags = new HashSet<>(updatedCertificate.getTags());
+        List<Tag> oldTags = oldCertificate.getTags();
+        List<Tag> updatedTags = updatedCertificate.getTags();
 
-        Set<Tag> commonTags = getCommonTags(oldTags, updatedTags);
+        List<Tag> commonTags = getCommonTags(oldTags, updatedTags);
 
         oldTags.removeAll(commonTags);
         updatedTags.removeAll(commonTags);
 
-        result.addAll(getQueriesForRemovalOfUnusedTagLinks(oldTags));
-        result.addAll(getQueriesForAdditionOfNewTagLinks(updatedTags));
+        result.addAll(getQueryForRemovalOfUnusedTagLinks(oldTags));
+        result.addAll(getQueryForAdditionOfNewTagLinks(updatedTags));
         return result;
     }
 
-    private Set<Tag> getCommonTags(Set<Tag> oldTags, Set<Tag> newTags){
-        Set<Tag> commonTags = new HashSet<>(oldTags);
+    private List<Tag> getCommonTags(List<Tag> oldTags, List<Tag> newTags){
+        List<Tag> commonTags = new ArrayList<>(oldTags);
         commonTags.retainAll(newTags);
 
         return commonTags;
     }
 
-    private MultiValueMap<String, List<Object>> getQueriesForRemovalOfUnusedTagLinks(Set<Tag> unusedTags){
+    private MultiValueMap<String, List<Object>> getQueryForRemovalOfUnusedTagLinks(List<Tag> unusedTags){
         MultiValueMap<String, List<Object>> result = new LinkedMultiValueMap<>();
-        for(Tag tag : unusedTags){
-            result.add(
-                    SQL_REMOVE_TAG_LINK,
-                    Arrays.asList(oldCertificate.getId(),tag.getId()));
+        if(!CollectionUtils.isEmpty(unusedTags)){
+            StringBuilder query = new StringBuilder(SQL_REMOVE_TAG_LINK);
+            List<Object> params = new ArrayList<>();
+            int tagsLeft = unusedTags.size();
+            for(Tag tag : unusedTags){
+                query.append(String.format("(%s=? AND %s=?)",
+                                DBMetadata.CERT_HAS_TAG_TABLE_ID_CERT,
+                                DBMetadata.CERT_HAS_TAG_TABLE_ID_TAG))
+                        .append(tagsLeft-- > 1 ? " OR " : "");
+                params.add(oldCertificate.getId());
+                params.add(tag.getId());
+            }
+            result.add(query.toString(), params);
         }
         return result;
     }
 
-    private MultiValueMap<String, List<Object>> getQueriesForAdditionOfNewTagLinks(Set<Tag> addedTags){
+    private MultiValueMap<String, List<Object>> getQueryForAdditionOfNewTagLinks(List<Tag> addedTags){
         MultiValueMap<String, List<Object>> result = new LinkedMultiValueMap<>();
-        for(Tag tag : addedTags){
-            result.add(
-                    SQL_CREATE_TAG_LINK,
-                    Arrays.asList(oldCertificate.getId(),tag.getId()));
+        if(!CollectionUtils.isEmpty(addedTags)){
+            StringBuilder query = new StringBuilder(SQL_CREATE_TAG_LINK);
+            List<Object> params = new ArrayList<>();
+            int tagsLeft = addedTags.size();
+            for(Tag tag : addedTags){
+                query.append("(?,?)").append(tagsLeft-- > 1 ? "," : "");
+                params.add(oldCertificate.getId());
+                params.add(tag.getId());
+            }
+            result.add(query.toString(), params);
         }
         return result;
     }

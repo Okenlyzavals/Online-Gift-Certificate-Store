@@ -10,5 +10,5 @@ public interface GiftCertificateDao extends AbstractDao<GiftCertificate> {
 
     List<GiftCertificate> retrieveByCriteria(Criteria criteria);
 
-    void update(GiftCertificate entity);
+    GiftCertificate update(GiftCertificate entity);
 }

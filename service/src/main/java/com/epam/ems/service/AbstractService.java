@@ -35,7 +35,7 @@ public interface AbstractService<T extends DataTransferObject> {
      * @param entity Entity to save, wrapped in corresponding DTO.
      * @throws DuplicateEntityException if such entity already exists.
      */
-    void insert(T entity) throws DuplicateEntityException;
+    T insert(T entity) throws DuplicateEntityException;
 
     /**
      * Removes entity from Data Source by its ID.

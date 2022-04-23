@@ -8,11 +8,13 @@ import com.epam.ems.service.exception.NoSuchEntityException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -59,11 +61,11 @@ public class TagController {
      * @param tagDto {@link TagDto} to create
      * @throws DuplicateEntityException if the same tag already exists
      */
-    @PostMapping(consumes = "application/json")
+    @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
-    public void createTag(
-            @Valid @RequestBody TagDto tagDto) throws DuplicateEntityException {
-        tagService.insert(tagDto);
+    public TagDto createTag(
+            @NotNull(message = "msg.dto.null") @Valid @RequestBody  TagDto tagDto) throws DuplicateEntityException {
+        return tagService.insert(tagDto);
     }
 
     /**

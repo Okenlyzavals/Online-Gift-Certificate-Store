@@ -9,7 +9,7 @@ public interface AbstractDao<T> {
 
     List<T> retrieveAll();
 
-    Long create(T entity);
+    T create(T entity);
 
     void delete(long id);
 

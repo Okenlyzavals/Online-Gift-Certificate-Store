@@ -24,7 +24,6 @@ public class SqlTagDao implements TagDao {
 
     private static final String SQL_SELECT=String.format(
             "SELECT * FROM %s", DBMetadata.TAG_TABLE);
-
     private static final String SQL_SELECT_ID=
             SQL_SELECT + String.format(" WHERE %s=?", DBMetadata.TAG_TABLE_ID);
     private static final String SQL_SELECT_NAME=
@@ -56,10 +55,8 @@ public class SqlTagDao implements TagDao {
 
     @Override
     public Optional<Tag> retrieveById(long id) {
-        return template.query(
-                SQL_SELECT_ID,
-                tagRowMapper,
-                id).stream().findAny();
+        List<Tag> tags = template.query(SQL_SELECT_ID, tagRowMapper, id);
+        return !tags.isEmpty() ? Optional.of(tags.get(0)) : Optional.empty();
     }
 
     @Override
@@ -68,14 +65,15 @@ public class SqlTagDao implements TagDao {
     }
 
     @Override
-    public Long create(Tag entity) {
+    public Tag create(Tag entity) {
         KeyHolder holder = new GeneratedKeyHolder();
         template.update(con -> {
             PreparedStatement statement = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
             statement.setObject(1, entity.getName());
             return statement;
         },holder);
-        return holder.getKey().longValue();
+        Long key = holder.getKey().longValue();
+        return retrieveById(key).get();
     }
 
     @Override
