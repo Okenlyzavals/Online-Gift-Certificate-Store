@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface GiftCertificateDao extends AbstractDao<GiftCertificate> {
 
-    List<GiftCertificate> retrieveByCriteria(Criteria criteria);
+    List<GiftCertificate> retrieveByCriteria(Criteria criteria, int page, int elements);
 
     GiftCertificate update(GiftCertificate entity);
 }

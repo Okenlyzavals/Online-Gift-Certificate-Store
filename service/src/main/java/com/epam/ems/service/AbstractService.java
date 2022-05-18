@@ -28,7 +28,7 @@ public interface AbstractService<T extends DataTransferObject> {
      * @return List of all entities retrieved from Data Source,
      * each one being wrapped in corresponding DTO.
      */
-    List<T> getAll();
+    List<T> getAll(int page, int elements);
 
     /**
      * Saves entity to Data Source.

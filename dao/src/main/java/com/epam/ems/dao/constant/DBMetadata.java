@@ -17,4 +17,22 @@ public final class DBMetadata {
     public static final String CERT_HAS_TAG_TABLE="certificate_has_tag";
     public static final String CERT_HAS_TAG_TABLE_ID_CERT="id_certificate";
     public static final String CERT_HAS_TAG_TABLE_ID_TAG="id_tag";
+
+    public static final String USER_TABLE="users";
+    public static final String USER_TABLE_ID="id_users";
+    public static final String USER_TABLE_EMAIL="email";
+    public static final String USER_TABLE_PASSWORD="password";
+    public static final String USER_TABLE_USERNAME="username";
+
+    public static final String ORDER_TABLE="orders";
+    public static final String ORDER_TABLE_ID="id_orders";
+    public static final String ORDER_TABLE_DATE="purchase_date";
+    public static final String ORDER_TABLE_PRICE="order_price";
+    public static final String ORDER_TABLE_USER="id_user";
+
+    public static final String ORDER_HAS_CERT_TABLE="orders_has_certificates";
+    public static final String ORDER_HAS_CERT_TABLE_ID_ORDER="order_id";
+    public static final String ORDER_HAS_CERT_TABLE_ID_CERT="cert_id";
+
+
 }

@@ -18,4 +18,6 @@ public interface TagService extends AbstractService<TagDto> {
      * @throws NoSuchEntityException if no tag with this name was found.
      */
     TagDto getByName(String name);
+
+    TagDto retrieveMostUsedTagOfUserWithLargestOrderCost();
 }

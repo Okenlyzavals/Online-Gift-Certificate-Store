@@ -5,24 +5,32 @@ import com.epam.ems.dao.entity.Tag;
 import com.epam.ems.service.dto.GiftCertificateDto;
 import com.epam.ems.service.dto.TagDto;
 import com.epam.ems.service.mapper.Mapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
 public class GiftCertificateDtoMapper implements Mapper<GiftCertificate, GiftCertificateDto> {
+
+    private final Mapper<Tag, TagDto> tagMapper;
+
+    @Autowired
+    public GiftCertificateDtoMapper(Mapper<Tag, TagDto> tagMapper){
+        this.tagMapper = tagMapper;
+    }
 
     @Override
     public GiftCertificateDto map(GiftCertificate certificate){
         if(certificate == null){
             return new GiftCertificateDto();
         }
-        List<TagDto> tagDtoList = (certificate.getTags() != null)
+        Set<TagDto> tagDtoList = (certificate.getTags() != null)
                 ? certificate.getTags()
                     .stream()
-                    .map(e-> new TagDto(e.getId(), e.getName()))
-                    .collect(Collectors.toList())
+                    .map(tagMapper::map)
+                    .collect(Collectors.toSet())
                 : null;
 
         return new GiftCertificateDto(
@@ -43,10 +51,10 @@ public class GiftCertificateDtoMapper implements Mapper<GiftCertificate, GiftCer
             return GiftCertificate.builder().build();
         }
 
-        List<Tag> tags = (dto.getTags() != null)
+        Set<Tag> tags = (dto.getTags() != null)
                 ? dto.getTags().stream()
-                    .map(e -> Tag.builder().id(e.getId()).name(e.getName()).build())
-                    .collect(Collectors.toList())
+                    .map(tagMapper::extract)
+                    .collect(Collectors.toSet())
                 : null;
 
         return GiftCertificate.builder()

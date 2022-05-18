@@ -9,5 +9,5 @@ public interface TagDao extends AbstractDao<Tag>{
 
     Optional<Tag> findByName(String name);
 
-    List<Tag> retrieveTagsByCertificateId(Long certificateId);
+    Optional<Tag> findMostUsedTagOfUserWithHighestOrderCost();
 }

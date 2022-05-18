@@ -5,12 +5,13 @@ import com.epam.ems.service.dto.TagDto;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class TagDtoListValidator implements ConstraintValidator<TagDtoListConstraint, List<TagDto>> {
+public class TagDtoListValidator implements ConstraintValidator<TagDtoListConstraint, Set<TagDto>> {
 
     @Override
-    public boolean isValid(List<TagDto> value, ConstraintValidatorContext context) {
+    public boolean isValid(Set<TagDto> value, ConstraintValidatorContext context) {
         if(value == null){
             return true;
         }

@@ -7,11 +7,9 @@ public interface AbstractDao<T> {
 
     Optional<T> retrieveById(long id);
 
-    List<T> retrieveAll();
+    List<T> retrieveAll(int page, int elements);
 
     T create(T entity);
 
     void delete(long id);
-
-    void delete(T entity);
 }

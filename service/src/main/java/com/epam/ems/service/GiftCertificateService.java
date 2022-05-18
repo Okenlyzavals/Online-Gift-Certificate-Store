@@ -23,7 +23,7 @@ public interface GiftCertificateService extends AbstractService<GiftCertificateD
      * @return List of {@link GiftCertificateDto} instances
      * matching given criteria.
      */
-    List<GiftCertificateDto> getByCriteria(Map<String, String> criteria);
+    List<GiftCertificateDto> getByCriteria(Map<String, Object> criteria, int page, int elements);
 
     /**
      * Updates given certificate in Data Source.

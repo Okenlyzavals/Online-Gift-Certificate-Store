@@ -5,10 +5,12 @@ import com.epam.ems.service.dto.GiftCertificateDto;
 import com.epam.ems.service.dto.TagDto;
 import com.epam.ems.service.exception.DuplicateEntityException;
 import com.epam.ems.service.exception.NoSuchEntityException;
+import com.epam.ems.web.hateoas.Hateoas;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,11 +30,13 @@ import java.util.List;
 @ComponentScan({"com.epam.ems.service.impl", "com.epam.ems.web.exception"})
 public class TagController {
 
-    private TagService tagService;
+    private final TagService tagService;
+    private final Hateoas<TagDto> hateoas;
 
     @Autowired
-    public TagController(TagService tagService){
+    public TagController(TagService tagService, Hateoas<TagDto> hateoas){
         this.tagService = tagService;
+        this.hateoas = hateoas;
     }
 
     /**
@@ -40,8 +44,12 @@ public class TagController {
      * @return List of {@link TagDto} retrieved from data source
      */
     @GetMapping
-    public List<TagDto> getTags(){
-        return tagService.getAll();
+    public List<TagDto> getTags(
+            @RequestParam(defaultValue = "1") @Min(1) int page,
+            @RequestParam(defaultValue = "5") @Min(1)int elements){
+        List<TagDto> res = tagService.getAll(page,elements);
+        res.forEach(hateoas::buildHateoas);
+        return res;
     }
 
     /**
@@ -53,7 +61,12 @@ public class TagController {
     @GetMapping("/{id}")
     public TagDto getTagById(
             @PathVariable("id") @Min(value = 1, message = "msg.id.negative") long id) throws NoSuchEntityException {
-        return tagService.getById(id);
+        return hateoas.buildHateoas(tagService.getById(id));
+    }
+
+    @GetMapping("/widest")
+    public TagDto getMostWidelyUsedTag(){
+        return hateoas.buildHateoas(tagService.retrieveMostUsedTagOfUserWithLargestOrderCost());
     }
 
     /**
@@ -65,7 +78,7 @@ public class TagController {
     @ResponseStatus(HttpStatus.CREATED)
     public TagDto createTag(
             @NotNull(message = "msg.dto.null") @Valid @RequestBody  TagDto tagDto) throws DuplicateEntityException {
-        return tagService.insert(tagDto);
+        return hateoas.buildHateoas(tagService.insert(tagDto));
     }
 
     /**
@@ -74,9 +87,11 @@ public class TagController {
      * @throws NoSuchEntityException if such tag does not exist in data source.
      */
     @DeleteMapping("/{id}")
-    public void deleteTag(
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<Void> deleteTag(
             @PathVariable("id") @Min(value = 1, message = "msg.id.negative") long id) throws NoSuchEntityException{
         tagService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

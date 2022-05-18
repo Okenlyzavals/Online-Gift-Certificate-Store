@@ -2,21 +2,22 @@ package com.epam.ems.dao.entity.criteria;
 
 import lombok.Getter;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 @Getter
-public class Criteria extends LinkedHashMap<Criteria.ParamName, String> {
+public class Criteria extends LinkedHashMap<Criteria.ParamName, Object> {
 
     public enum ParamName{
-        TAG_NAME, NAME_CONTAINS,
+        TAG_NAMES, NAME_CONTAINS,
         DESCRIPTION_CONTAINS, ORDER_DATE_ASC,
         ORDER_NAME_ASC, ORDER_DATE_DESC, ORDER_NAME_DESC
     }
     public Criteria(){}
 
     @Override
-    public String put(ParamName key, String value) {
+    public Object put(ParamName key, Object value) {
         if(key == null){
             return null;
         }
@@ -41,7 +42,7 @@ public class Criteria extends LinkedHashMap<Criteria.ParamName, String> {
     }
 
     @Override
-    public String remove(Object key) {
+    public Object remove(Object key) {
         return super.remove(key);
     }
 }
