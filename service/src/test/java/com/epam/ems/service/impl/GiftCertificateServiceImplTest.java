@@ -8,10 +8,12 @@ import com.epam.ems.service.dto.GiftCertificateDto;
 import com.epam.ems.service.dto.TagDto;
 import com.epam.ems.service.exception.NoSuchEntityException;
 import com.epam.ems.service.mapper.impl.GiftCertificateDtoMapper;
+import com.epam.ems.service.mapper.impl.TagDtoMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
@@ -26,12 +28,12 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class GiftCertificateServiceImplTest {
 
+    @Spy
+    private GiftCertificateDtoMapper mapper = new GiftCertificateDtoMapper(new TagDtoMapper());
     @Mock
     private GiftCertificateDao dao;
     @Mock
     private TagDao tagDao;
-    @Mock
-    private GiftCertificateDtoMapper mapper;
 
     @InjectMocks
     private GiftCertificateServiceImpl service;
@@ -39,10 +41,10 @@ public class GiftCertificateServiceImplTest {
     @Test
     void testGetAll(){
         List<GiftCertificate> certificateList = List.of(
-                GiftCertificate.builder().id(1L).tags(new ArrayList<>()).name("Cert one").build(),
-                GiftCertificate.builder().id(2L).tags(new ArrayList<>()).name("Cert two").build(),
-                GiftCertificate.builder().id(3L).tags(new ArrayList<>()).name("Cert+tags")
-                        .tags(List.of(new Tag(1L,"tag"), new Tag(2L,"tyg"))).build());
+                GiftCertificate.builder().id(1L).tags(new HashSet<>()).name("Cert one").build(),
+                GiftCertificate.builder().id(2L).tags(new HashSet<>()).name("Cert two").build(),
+                GiftCertificate.builder().id(3L).tags(new HashSet<>()).name("Cert+tags")
+                        .tags(Set.of(new Tag(1L,"tag",null), new Tag(2L,"tyg",null))).build());
         List<GiftCertificateDto> expected = certificateList
                 .stream()
                 .map(e->new GiftCertificateDto(e.getId(),
@@ -50,13 +52,12 @@ public class GiftCertificateServiceImplTest {
                         e.getPrice(), e.getDuration(), e.getCreateDate(),
                         e.getLastUpdateDate(),
                         e.getTags().stream().map(o->new TagDto(o.getId(), o.getName()))
-                                .collect(Collectors.toList())))
+                                .collect(Collectors.toSet())))
                 .collect(Collectors.toList());
 
-        when(dao.retrieveAll()).thenReturn(certificateList);
-        when(mapper.map(any())).thenCallRealMethod();
+        when(dao.retrieveAll(anyInt(),anyInt())).thenReturn(certificateList);
 
-        List<GiftCertificateDto> actual = service.getAll();
+        List<GiftCertificateDto> actual = service.getAll(5,5);
         assertEquals(expected, actual);
     }
 
@@ -65,7 +66,6 @@ public class GiftCertificateServiceImplTest {
         GiftCertificateDto expected = new GiftCertificateDto(15L, "cert", null,null,null,null,null,null);
 
         when(dao.retrieveById(15L)).thenReturn(Optional.of(GiftCertificate.builder().id(15L).name("cert").build()));
-        when(mapper.map(any())).thenCallRealMethod();
 
         GiftCertificateDto actual = service.getById(15L);
         assertEquals(expected, actual);
@@ -79,19 +79,16 @@ public class GiftCertificateServiceImplTest {
 
     @Test
     void testInsertNewEntityWithoutTags(){
-        when(dao.create(any())).thenReturn(1L);
-        when(mapper.extract(any())).thenCallRealMethod();
+        when(dao.create(any())).thenReturn(null);
         assertDoesNotThrow(()->service.insert(new GiftCertificateDto()));
     }
 
     @Test
     void testInsertNewEntityWithTags(){
         GiftCertificateDto toInsert = new GiftCertificateDto();
-        toInsert.setTags(List.of(new TagDto(null,"tag"), new TagDto(2L,"tug")));
+        toInsert.setTags(Set.of(new TagDto(null,"tag"), new TagDto(2L,"tug")));
 
-        when(dao.create(any())).thenReturn(1L);
-        when(tagDao.create(any())).thenReturn(0L);
-        when(mapper.extract(any())).thenCallRealMethod();
+        when(dao.create(any())).thenReturn(null);
 
         assertDoesNotThrow(()->service.insert(toInsert));
     }
@@ -130,26 +127,14 @@ public class GiftCertificateServiceImplTest {
 
     @Test
     void retrieveByCorrectCriteriaTest(){
-        Map<String,String> criteria = new LinkedHashMap<>();
+        Map<String,Object> criteria = new LinkedHashMap<>();
         criteria.put("ORDER_BY_NAME_ASC","");
         criteria.put("TAG_NAME","tag");
         List<GiftCertificateDto> expected = List.of(new GiftCertificateDto());
 
-        when(dao.retrieveByCriteria(any())).thenReturn(List.of(GiftCertificate.builder().build()));
-        when(mapper.map(any())).thenCallRealMethod();
+        when(dao.retrieveByCriteria(any(),anyInt(),anyInt())).thenReturn(List.of(GiftCertificate.builder().build()));
 
-        assertEquals(expected, service.getByCriteria(criteria));
-    }
-
-    @Test
-    void retrieveByNullCriteriaTest(){
-
-        List<GiftCertificateDto> expected = List.of(new GiftCertificateDto());
-
-        when(dao.retrieveByCriteria(any())).thenReturn(List.of(GiftCertificate.builder().build()));
-        when(mapper.map(any())).thenCallRealMethod();
-
-        assertEquals(expected, service.getByCriteria(null));
+        assertEquals(expected, service.getByCriteria(criteria,1,1));
     }
 
     @Test
@@ -166,11 +151,9 @@ public class GiftCertificateServiceImplTest {
     void updateExistingWithTagsTest(){
         GiftCertificateDto toUpdate = new GiftCertificateDto();
         toUpdate.setId(1L);
-        toUpdate.setTags(List.of(new TagDto(null,"tag"), new TagDto(2L,"tug")));
+        toUpdate.setTags(Set.of(new TagDto(null,"tag"), new TagDto(2L,"tug")));
 
-        when(tagDao.create(any())).thenReturn(0L);
         when(dao.retrieveById(anyLong())).thenReturn(Optional.of(GiftCertificate.builder().build()));
-        when(mapper.extract(any())).thenCallRealMethod();
 
         assertDoesNotThrow(()->service.update(toUpdate));
     }

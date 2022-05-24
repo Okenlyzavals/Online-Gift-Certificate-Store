@@ -28,15 +28,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {HibernateTagDao.class,
-        HibernateGiftCertificateDao.class, TestDbConfig.class,
+@ContextConfiguration(classes = {TagDaoImpl.class,
+        GiftCertificateDaoImpl.class, TestDbConfig.class,
         CriteriaQueryBuilder.class},
         loader = AnnotationConfigContextLoader.class)
 @ActiveProfiles("dev")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest
 @Transactional
-public class SqlGiftCertificateDaoTest {
+public class GiftCertificateDaoTest {
 
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
 

@@ -21,11 +21,11 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {HibernateTagDao.class, TestDbConfig.class}, loader = AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = {TagDaoImpl.class, TestDbConfig.class}, loader = AnnotationConfigContextLoader.class)
 @ActiveProfiles("dev")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest
-public class SqlTagDaoTest {
+public class TagDaoTest {
 
     @Autowired
     TagDao dao;
