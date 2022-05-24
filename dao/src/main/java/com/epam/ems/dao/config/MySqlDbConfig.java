@@ -8,19 +8,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
-import java.util.Objects;
 import java.util.Properties;
-import java.util.logging.Level;
 
 @Configuration
 @EnableTransactionManagement
@@ -32,10 +27,11 @@ public class MySqlDbConfig {
     private static final String DATABASE_USERNAME = "spring.datasource.username";
     private static final String DATABASE_PASSWORD = "spring.datasource.password";
 
-    private static final String DATABASE_HIBERNATE_DIALECT = "spring.jpa.properties.hibernate.dialect";
+    private static final String DATABASE_HIBERNATE_DIALECT = "spring.jpa.database-platform";
     private static final String DATABASE_SHOW_SQL = "spring.jpa.show-sql";
     private static final String DATABASE_DDL_AUTO = "spring.jpa.hibernate.ddl-auto";
     private static final String SESSION_CONTEXT_CLASS="spring.jpa.properties.hibernate.current_session_context_class";
+
     private Environment environment;
 
     @Autowired
@@ -61,20 +57,19 @@ public class MySqlDbConfig {
     public SessionFactory getSessionFactory(DataSource dataSource) throws Exception {
         Properties properties = new Properties();
 
-        properties.put(DATABASE_HIBERNATE_DIALECT, environment.getProperty(DATABASE_HIBERNATE_DIALECT));
+        properties.put("hibernate.dialect", environment.getProperty(DATABASE_HIBERNATE_DIALECT));
         properties.put(DATABASE_SHOW_SQL, environment.getProperty(DATABASE_SHOW_SQL));
-        properties.put(DATABASE_DDL_AUTO, environment.getProperty(DATABASE_DDL_AUTO));
+        properties.put("hibernate.hbm2ddl.auto", environment.getProperty(DATABASE_DDL_AUTO));
         properties.put(SESSION_CONTEXT_CLASS, environment.getProperty(SESSION_CONTEXT_CLASS));
 
         LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
-        factoryBean.setPackagesToScan(new String[] { "" });
+        factoryBean.setPackagesToScan("");
         factoryBean.setDataSource(dataSource);
         factoryBean.setHibernateProperties(properties);
         factoryBean.afterPropertiesSet();
 
         return factoryBean.getObject();
     }
-
 
     @Bean
     @Profile("dev")
@@ -92,5 +87,4 @@ public class MySqlDbConfig {
     public HibernateTransactionManager getTransactionManager(SessionFactory sessionFactory) {
         return new HibernateTransactionManager(sessionFactory);
     }
-
 }

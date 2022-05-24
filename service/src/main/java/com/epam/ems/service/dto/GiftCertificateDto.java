@@ -3,20 +3,17 @@ package com.epam.ems.service.dto;
 
 import com.epam.ems.service.validation.OnCreate;
 import com.epam.ems.service.validation.OnUpdate;
-import com.epam.ems.service.validation.custom.TagDtoListConstraint;
+import com.epam.ems.service.validation.custom.constraint.TagDtoListConstraint;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
-import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)

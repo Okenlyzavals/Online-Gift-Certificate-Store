@@ -1,16 +1,13 @@
 package com.epam.ems.dao.querybuilder;
 
 import com.epam.ems.dao.entity.GiftCertificate;
-import com.epam.ems.dao.entity.Tag;
 import com.epam.ems.dao.entity.criteria.Criteria;
-import org.hibernate.criterion.Criterion;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -87,6 +84,9 @@ public class CriteriaQueryBuilder{
                 orders.add(ORDER_MAP.get(paramName).getOrder(builder, root));
             }
         });
+        if (orders.isEmpty()){
+            orders.add(builder.asc(root.get("id")));
+        }
         return orders.toArray(new Order[0]);
     }
 

@@ -25,7 +25,9 @@ public interface AbstractService<T extends DataTransferObject> {
 
     /**
      * Retrieves all entities stored in Data Source.
-     * @return List of all entities retrieved from Data Source,
+     * @param page Page to browse.
+     * @param elements Number of elements per page.
+     * @return List of all entities (trimmed to fit page & elements) retrieved from Data Source,
      * each one being wrapped in corresponding DTO.
      */
     List<T> getAll(int page, int elements);

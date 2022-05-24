@@ -6,6 +6,13 @@ import com.epam.ems.service.mapper.Mapper;
 import org.springframework.stereotype.Component;
 
 
+/**
+ * Extension of {@link Mapper} suited for
+ * {@link User} Entity and {@link UserDto} DTO.
+ *
+ * @author Baranouski Y. K.
+ * @version 1.0.0
+ */
 @Component
 public class UserDtoMapper implements Mapper<User, UserDto> {
 

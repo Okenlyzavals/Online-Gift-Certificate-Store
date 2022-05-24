@@ -17,7 +17,13 @@ public interface TagService extends AbstractService<TagDto> {
      * @return Instance of {@link TagDto} with this name.
      * @throws NoSuchEntityException if no tag with this name was found.
      */
-    TagDto getByName(String name);
+    TagDto getByName(String name) throws NoSuchEntityException;
 
-    TagDto retrieveMostUsedTagOfUserWithLargestOrderCost();
+    /**
+     * Retrieves the tag that is most widely used
+     * by user that has the largest sum of all orders.
+     * @return instance of {@link TagDto}
+     * @throws NoSuchEntityException if no tag fitting such demand was found.
+     */
+    TagDto retrieveMostUsedTagOfUserWithLargestOrderCost() throws NoSuchEntityException;
 }

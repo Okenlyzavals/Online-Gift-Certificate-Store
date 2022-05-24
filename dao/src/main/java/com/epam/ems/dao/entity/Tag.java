@@ -1,10 +1,11 @@
 package com.epam.ems.dao.entity;
 
+import com.epam.ems.dao.audit.AuditEntityListener;
 import com.epam.ems.dao.constant.DBMetadata;
+import javax.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
 
-import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
 
@@ -17,6 +18,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = DBMetadata.TAG_TABLE)
+@EntityListeners(AuditEntityListener.class)
 @NamedStoredProcedureQuery(
         name="GetMostUsedTag",
         procedureName="GetMostUsedTag",

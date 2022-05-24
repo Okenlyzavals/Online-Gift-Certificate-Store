@@ -20,7 +20,9 @@ public interface GiftCertificateService extends AbstractService<GiftCertificateD
      * by map of filter configuration parameters.
      *
      * @param criteria A map containing filter as key and value to filter by as value.
-     * @return List of {@link GiftCertificateDto} instances
+     * @param page Page to start display from.
+     * @param elements Number of elements per page.
+     * @return List of {@link GiftCertificateDto} instances (trimmed to fit page & elements)
      * matching given criteria.
      */
     List<GiftCertificateDto> getByCriteria(Map<String, Object> criteria, int page, int elements);

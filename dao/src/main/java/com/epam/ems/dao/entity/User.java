@@ -1,5 +1,6 @@
 package com.epam.ems.dao.entity;
 
+import com.epam.ems.dao.audit.AuditEntityListener;
 import com.epam.ems.dao.constant.DBMetadata;
 import lombok.*;
 import org.hibernate.Hibernate;
@@ -17,6 +18,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = DBMetadata.USER_TABLE)
+@EntityListeners(AuditEntityListener.class)
 public class User{
 
     @Id

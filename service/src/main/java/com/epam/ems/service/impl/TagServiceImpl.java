@@ -17,7 +17,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@ComponentScan({"com.epam.ems.dao", "com.epam.ems.service"})
 public class TagServiceImpl implements TagService {
 
     private final TagDao dao;
@@ -39,13 +38,14 @@ public class TagServiceImpl implements TagService {
 
         return dao.retrieveAll(page,elements)
                 .stream()
-                .map(e->mapper.map(e))
+                .map(mapper::map)
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
     public TagDto insert(TagDto entity) throws DuplicateEntityException {
+        entity.setId(null);
         findDuplicate(entity).ifPresent(d->{
             throw new DuplicateEntityException(d.getId(), Tag.class);
         });
@@ -53,15 +53,7 @@ public class TagServiceImpl implements TagService {
     }
 
     private Optional<Tag> findDuplicate(TagDto entity){
-        Optional<Tag> duplicate;
-
-        duplicate = dao.findByName(entity.getName());
-        if(duplicate.isPresent()
-                && (duplicate.get().getId().equals(entity.getId())) || entity.getId() == null) {
-            return duplicate;
-        }
-        duplicate = dao.retrieveById(entity.getId());
-        return duplicate;
+        return dao.findByName(entity.getName());
     }
 
     @Override

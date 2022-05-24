@@ -1,5 +1,6 @@
 package com.epam.ems.dao.entity;
 
+import com.epam.ems.dao.audit.AuditEntityListener;
 import com.epam.ems.dao.constant.DBMetadata;
 import lombok.*;
 import org.hibernate.Hibernate;
@@ -21,6 +22,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = DBMetadata.CERTIFICATES_TABLE)
+@EntityListeners(AuditEntityListener.class)
 @DynamicUpdate
 public class GiftCertificate{
 
@@ -61,17 +63,6 @@ public class GiftCertificate{
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "certificates")
     @ToString.Exclude
     private List<Order> orders;
-
-    @PrePersist
-    private void onPrePersist(){
-        setCreateDate(LocalDateTime.now());
-        setLastUpdateDate(LocalDateTime.now());
-    }
-
-    @PreUpdate
-    private void onPreUpdate(){
-        setLastUpdateDate(LocalDateTime.now());
-    }
 
     @Override
     public boolean equals(Object o) {

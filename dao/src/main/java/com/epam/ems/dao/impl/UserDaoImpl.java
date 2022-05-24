@@ -5,6 +5,7 @@ import com.epam.ems.dao.entity.Order;
 import com.epam.ems.dao.entity.User;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -16,8 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@ComponentScan("com.epam.ems.dao")
-public class HibernateUserDao implements UserDao {
+public class UserDaoImpl implements UserDao {
 
     @PersistenceContext
     public EntityManager manager;
@@ -29,11 +29,12 @@ public class HibernateUserDao implements UserDao {
 
     @Override
     public List<User> retrieveAll(int page, int elements) {
-        CriteriaBuilder criteriaBuilder = manager.getCriteriaBuilder();
+        CriteriaBuilder builder = manager.getCriteriaBuilder();
 
-        CriteriaQuery<User> query = criteriaBuilder.createQuery(User.class);
+        CriteriaQuery<User> query = builder.createQuery(User.class);
         Root<User> root = query.from(User.class);
         query.select(root);
+        query.orderBy(builder.asc(root.get("id")));
 
         TypedQuery<User> typedQuery = manager.createQuery(query);
         typedQuery.setFirstResult((page-1)*elements);
@@ -42,12 +43,14 @@ public class HibernateUserDao implements UserDao {
     }
 
     @Override
+    @Transactional
     public User create(User entity) {
         manager.persist(entity);
         return entity;
     }
 
     @Override
+    @Transactional
     public void delete(long id) {
         throw new UnsupportedOperationException();
     }

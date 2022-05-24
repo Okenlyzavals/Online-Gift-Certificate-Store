@@ -9,6 +9,11 @@ import lombok.Setter;
 
 import java.util.Map;
 
+/**
+ * General exception class for Service layer.
+ * @author Baranouski Y. K.
+ * @version 1.0.0
+ */
 @Getter
 @Setter
 public abstract class ServiceException extends RuntimeException {

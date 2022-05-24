@@ -1,5 +1,21 @@
-INSERT INTO `gift_certificate` VALUES (DEFAULT,'Programming book store certificate','Acquire new Java, C#, C, or C++ books to develop your programming skills.',100.00000,30,'2022-04-02 12:50:50','2022-04-06 16:16:31'),
-                                      (DEFAULT,'Alpha movie store',NULL,125.00000,7,'2022-04-02 15:19:42','2022-04-02 15:19:42'),
-                                      (DEFAULT,'Grocery store certificate','Walmart special gift certificate for yall ninjas',45.50000,21,'2022-04-06 16:25:00','2022-04-06 16:26:40');
-INSERT INTO `tag` VALUES (DEFAULT ,'Java'),(DEFAULT ,'Books'),(DEFAULT,'Programming'),(DEFAULT,'Professional'),(DEFAULT,'C language'),(DEFAULT,'C#'),(DEFAULT,'C++'),(DEFAULT,'Movies'),(DEFAULT,'TV series'),(DEFAULT,'Cartoons'),(DEFAULT,'Groceries'),(DEFAULT,'Walmart');
-INSERT INTO `certificate_has_tag` VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(2,8),(2,9),(2,10),(3,11),(3,12);
+INSERT INTO tag VALUES (DEFAULT ,'clammish'),(DEFAULT,'subproofs'),
+                       (DEFAULT,'gesticulacious'),
+                       (DEFAULT,'inadjustability'),(DEFAULT,'curryfavour'),
+                       (DEFAULT,'high-blazing'),(DEFAULT,'put-out'),
+                       (DEFAULT,'twin-tractor'),(DEFAULT,'endomysium'),
+                       (DEFAULT,'murthering');
+
+INSERT INTO users VALUES (DEFAULT,'awakable@epam.test.com','garmentworker','awakable'),
+                         (DEFAULT,'buddles@epam.test.com','preshows','buddles'),
+                         (DEFAULT,'Euploeinae@epam.test.com','adiaphorism','Euploeinae'),
+                         (DEFAULT,'devocate@epam.test.com','unhidden','devocate');
+
+INSERT INTO gift_certificate VALUES (DEFAULT,'2022-03-08 15:33:15.000000','hooker-out Blase self-abhorring pseudotropine axemaster testing archdeceiver outsetting orientating',11,'2022-05-22 16:16:01.557016','fanwise tornado-swept certificate',1690.83),
+                                    (DEFAULT,'2022-04-14 16:56:02.000000','Lymantriidae shacklebone hematozzoa didactive glorification biochemically analabos anecdotist',56,'2022-05-22 16:16:01.567089','dimethylanthranilate Hentrich certificate',4400.86);
+
+INSERT INTO orders VALUES (DEFAULT,'2022-05-12 18:34:48.000000',1690.83,3),
+                          (DEFAULT,'2022-03-18 14:27:48.000000',6091.69,1);
+
+INSERT INTO orders_has_certificates VALUES (1,1),(2,1),(2,2);
+
+INSERT INTO certificate_has_tag VALUES (1,2),(2,2),(1,6),(2,6),(1,7),(1,8),(1,9),(1,10);

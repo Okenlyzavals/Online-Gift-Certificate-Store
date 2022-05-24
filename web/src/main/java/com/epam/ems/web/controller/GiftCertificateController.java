@@ -5,10 +5,10 @@ import com.epam.ems.service.dto.GiftCertificateDto;
 import com.epam.ems.service.exception.NoSuchEntityException;
 import com.epam.ems.service.validation.OnCreate;
 import com.epam.ems.service.validation.OnUpdate;
-import com.epam.ems.service.validation.custom.CriteriaConstraint;
+import com.epam.ems.service.validation.custom.constraint.CriteriaConstraint;
 import com.epam.ems.web.hateoas.Hateoas;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +20,8 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 /**
  * API class for basic operations with gift certificates.
  * @author Baranouski Y. K.
@@ -28,7 +30,6 @@ import java.util.Map;
 @Validated
 @RestController
 @RequestMapping(value = "/certificates")
-@ComponentScan({"com.epam.ems.service.impl", "com.epam.ems.web.exception"})
 public class GiftCertificateController {
 
     private final GiftCertificateService giftCertificateService;
@@ -41,55 +42,39 @@ public class GiftCertificateController {
         this.hateoas = hateoas;
     }
 
-    /**
-     * Returns all certificates stored in data source
-     * @return List of {@link GiftCertificateDto} retrieved from data source
-     */
     @GetMapping
-    public List<GiftCertificateDto> getAllCerts(
+    public CollectionModel<GiftCertificateDto> getAllCerts(
             @RequestParam(defaultValue = "1") @Min(1) int page,
             @RequestParam(defaultValue = "5") @Min(1)int elements){
         List<GiftCertificateDto> certs = giftCertificateService.getAll(page,elements);
         certs.forEach(hateoas::buildHateoas);
-        return certs;
+        return hateoas.buildPaginationModel(certs,
+                ()->page < 2 ? null : methodOn(getClass()).getAllCerts(1,elements),
+                ()->certs.size() < elements ? null : methodOn(getClass()).getAllCerts(page+1, elements),
+                ()->page < 2 ? null : methodOn(getClass()).getAllCerts(page-1, elements));
     }
 
-    /**
-     * Returns certificate stored in data source under specific ID
-     * @param id ID of a certificate
-     * @return Instance of {@link GiftCertificateDto} retrieved from data source
-     * @throws NoSuchEntityException if none was found
-     */
     @GetMapping("/{id}")
     public GiftCertificateDto getCertificate(
             @PathVariable @Min(value = 1, message = "msg.id.negative") long id) throws NoSuchEntityException {
         return hateoas.buildHateoas(giftCertificateService.getById(id));
     }
 
-    /**
-     * Returns all certificates stored in data source
-     * which match given criteria (filter)
-     *
-     * @param criteria A map containing filter as key and value to filter by as value.
-     * @return List of {@link GiftCertificateDto} retrieved from data source
-     */
-    @GetMapping("/by_criteria")
-    public List<GiftCertificateDto> getCertificatesByCriteria(
+    @GetMapping("/criteria")
+    public CollectionModel<GiftCertificateDto> getCertificatesByCriteria(
             @RequestBody
             @NotNull(message = "msg.dto.null")
             @CriteriaConstraint Map<String,Object> criteria,
             @RequestParam(defaultValue = "1") @Min(1) int page,
             @RequestParam(defaultValue = "5") @Min(1)int elements){
-        criteria.forEach((k,v)-> System.out.println(v.getClass()));
         List<GiftCertificateDto> certs = giftCertificateService.getByCriteria(criteria,page,elements);
         certs.forEach(hateoas::buildHateoas);
-        return certs;
+        return hateoas.buildPaginationModel(certs,
+                ()->page < 2 ? null : methodOn(getClass()).getCertificatesByCriteria(criteria,1,elements),
+                ()->certs.size() < elements ? null : methodOn(getClass()).getCertificatesByCriteria(criteria,page+1, elements),
+                ()->page < 2 ? null : methodOn(getClass()).getCertificatesByCriteria(criteria,page-1, elements));
     }
 
-    /**
-     * Creates new gift certificate in data source
-     * @param toCreate {@link GiftCertificateDto} to create
-     */
     @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
     public GiftCertificateDto insert(
@@ -100,12 +85,6 @@ public class GiftCertificateController {
         return hateoas.buildHateoas(giftCertificateService.insert(toCreate));
     }
 
-    /**
-     * Updates given certificate in data source.
-     * @param id ID of entity to update
-     * @param toUpdate Entity to update, wrapped in {@link GiftCertificateDto}
-     * @throws NoSuchEntityException if there is no such entity in Data Source.
-     */
     @PatchMapping(value = "/{id}",
             consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
     @ResponseStatus(HttpStatus.OK)
@@ -118,11 +97,6 @@ public class GiftCertificateController {
         return hateoas.buildHateoas(giftCertificateService.update(toUpdate));
     }
 
-    /**
-     * Removes certificate from Data Source by its ID.
-     * @param id ID of certificate to delete.
-     * @throws NoSuchEntityException if such certificate does not exist in data source.
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable @Min(value = 1, message = "msg.id.negative") long id) throws NoSuchEntityException{
         giftCertificateService.delete(id);

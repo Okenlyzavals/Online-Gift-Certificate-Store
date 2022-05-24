@@ -1,9 +1,9 @@
 package com.epam.ems.dao.entity;
 
+import com.epam.ems.dao.audit.AuditEntityListener;
 import com.epam.ems.dao.constant.DBMetadata;
 import lombok.*;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -20,6 +20,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = DBMetadata.ORDER_TABLE)
+@EntityListeners(AuditEntityListener.class)
 public class Order{
 
     @Id

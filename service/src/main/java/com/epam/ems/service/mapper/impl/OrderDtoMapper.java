@@ -9,9 +9,17 @@ import com.epam.ems.service.dto.UserDto;
 import com.epam.ems.service.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.stream.Collectors;
 
+/**
+ * Extension of {@link Mapper} suited for
+ * {@link Order} Entity and {@link OrderDto} DTO.
+ *
+ * @author Baranouski Y. K.
+ * @version 1.0.0
+ */
 @Component
 public class OrderDtoMapper implements Mapper<Order, OrderDto> {
 

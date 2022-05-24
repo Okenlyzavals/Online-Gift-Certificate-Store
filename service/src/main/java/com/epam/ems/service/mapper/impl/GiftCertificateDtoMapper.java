@@ -11,6 +11,13 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Extension of {@link Mapper} suited for
+ * {@link GiftCertificate} Entity and {@link GiftCertificateDto} DTO.
+ *
+ * @author Baranouski Y. K.
+ * @version 1.0.0
+ */
 @Component
 public class GiftCertificateDtoMapper implements Mapper<GiftCertificate, GiftCertificateDto> {
 

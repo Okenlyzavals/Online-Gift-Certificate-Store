@@ -1,16 +1,17 @@
-package com.epam.ems.service.validation.custom;
+package com.epam.ems.service.validation.custom.constraint;
 
+import com.epam.ems.service.validation.custom.CriteriaValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.*;
 
 @Documented
-@Constraint(validatedBy = TagDtoListValidator.class)
+@Constraint(validatedBy = CriteriaValidator.class)
 @Target( { ElementType.PARAMETER, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TagDtoListConstraint {
-    String message() default "msg.taglist.invalid";
+public @interface CriteriaConstraint {
+    String message() default "msg.criteria.invalid";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

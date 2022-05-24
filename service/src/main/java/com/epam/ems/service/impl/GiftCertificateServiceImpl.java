@@ -10,7 +10,6 @@ import com.epam.ems.service.dto.GiftCertificateDto;
 import com.epam.ems.service.exception.NoSuchEntityException;
 import com.epam.ems.service.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -21,12 +20,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@ComponentScan({"com.epam.ems.dao", "com.epam.ems.service"})
 public class GiftCertificateServiceImpl implements GiftCertificateService {
 
-    private GiftCertificateDao dao;
-    private TagDao tagDao;
-    private Mapper<GiftCertificate, GiftCertificateDto> mapper;
+    private final GiftCertificateDao dao;
+    private final TagDao tagDao;
+    private final Mapper<GiftCertificate, GiftCertificateDto> mapper;
 
     @Autowired
     public GiftCertificateServiceImpl(GiftCertificateDao dao, TagDao tagDao,
@@ -55,6 +53,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Transactional
     public GiftCertificateDto insert(GiftCertificateDto entity){
         entity.setLastUpdateDate(LocalDateTime.now());
+        entity.setId(null);
 
         GiftCertificate toCreate = mapper.extract(entity);
         toCreate.setTags(getTagsPreparedForDbOperations(toCreate));

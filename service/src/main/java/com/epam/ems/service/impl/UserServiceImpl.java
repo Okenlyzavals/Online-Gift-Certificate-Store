@@ -8,15 +8,12 @@ import com.epam.ems.service.exception.DuplicateEntityException;
 import com.epam.ems.service.exception.NoSuchEntityException;
 import com.epam.ems.service.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@ComponentScan({"com.epam.ems.dao", "com.epam.ems.service"})
 public class UserServiceImpl implements UserService {
 
     private final UserDao dao;

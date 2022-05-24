@@ -1,10 +1,10 @@
 package com.epam.ems.service.validation.custom;
 
 import com.epam.ems.service.dto.TagDto;
+import com.epam.ems.service.validation.custom.constraint.TagDtoListConstraint;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 

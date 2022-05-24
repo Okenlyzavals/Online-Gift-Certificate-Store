@@ -4,6 +4,7 @@ import com.epam.ems.dao.GiftCertificateDao;
 import com.epam.ems.dao.entity.GiftCertificate;
 import com.epam.ems.dao.entity.criteria.Criteria;
 import com.epam.ems.dao.querybuilder.CriteriaQueryBuilder;
+import org.hibernate.criterion.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Repository;
@@ -18,17 +19,15 @@ import javax.persistence.criteria.Root;
 import java.util.*;
 
 @Repository
-@ComponentScan({"com.epam.ems.dao"})
-public class HibernateGiftCertificateDao implements GiftCertificateDao {
+public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     private final CriteriaQueryBuilder criteriaQueryBuilder;
 
     @PersistenceContext
-    public EntityManager manager;
-
+    private EntityManager manager;
 
     @Autowired
-    public HibernateGiftCertificateDao(CriteriaQueryBuilder criteriaQueryBuilder){
+    public GiftCertificateDaoImpl(CriteriaQueryBuilder criteriaQueryBuilder){
         this.criteriaQueryBuilder = criteriaQueryBuilder;
     }
 
@@ -43,6 +42,7 @@ public class HibernateGiftCertificateDao implements GiftCertificateDao {
         CriteriaQuery<GiftCertificate> query = builder.createQuery(GiftCertificate.class);
         Root<GiftCertificate> root = query.from(GiftCertificate.class);
         query.select(root);
+        query.orderBy(builder.asc(root.get("id")));
 
         TypedQuery<GiftCertificate> typedQuery = manager.createQuery(query);
         typedQuery.setFirstResult((page-1)*elements);
@@ -52,14 +52,16 @@ public class HibernateGiftCertificateDao implements GiftCertificateDao {
     }
 
     @Override
+    @Transactional
     public GiftCertificate create(GiftCertificate entity) {
         manager.persist(entity);
         return entity;
     }
 
     @Override
+    @Transactional
     public void delete(long id) {
-        GiftCertificate toDelete = retrieveById(id).orElseThrow();
+        GiftCertificate toDelete = retrieveById(id).orElseThrow(IllegalArgumentException::new);
         manager.remove(toDelete);
     }
 
@@ -69,6 +71,7 @@ public class HibernateGiftCertificateDao implements GiftCertificateDao {
     }
 
     @Override
+    @Transactional
     public GiftCertificate update(GiftCertificate entity) {
         manager.merge(entity);
         return entity;

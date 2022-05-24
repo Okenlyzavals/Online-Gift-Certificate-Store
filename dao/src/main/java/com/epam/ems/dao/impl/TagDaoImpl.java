@@ -4,6 +4,7 @@ import com.epam.ems.dao.TagDao;
 import com.epam.ems.dao.entity.Tag;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -13,11 +14,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@ComponentScan("com.epam.ems.dao")
-public class HibernateTagDao implements TagDao {
+public class TagDaoImpl implements TagDao {
 
     @PersistenceContext
-    public EntityManager manager;
+    private EntityManager manager;
 
     @Override
     public Optional<Tag> retrieveById(long id) {
@@ -26,11 +26,12 @@ public class HibernateTagDao implements TagDao {
 
     @Override
     public List<Tag> retrieveAll(int page, int elements) {
-        CriteriaBuilder criteriaBuilder = manager.getCriteriaBuilder();
+        CriteriaBuilder builder = manager.getCriteriaBuilder();
 
-        CriteriaQuery<Tag> query = criteriaBuilder.createQuery(Tag.class);
+        CriteriaQuery<Tag> query = builder.createQuery(Tag.class);
         Root<Tag> root = query.from(Tag.class);
         query.select(root);
+        query.orderBy(builder.asc(root.get("id")));
 
         TypedQuery<Tag> typedQuery = manager.createQuery(query);
         typedQuery.setFirstResult((page-1)*elements);
@@ -40,14 +41,16 @@ public class HibernateTagDao implements TagDao {
     }
 
     @Override
+    @Transactional
     public Tag create(Tag entity) {
         manager.persist(entity);
         return entity;
     }
 
     @Override
+    @Transactional
     public void delete(long id) {
-        Tag toDelete = retrieveById(id).orElseThrow();
+        Tag toDelete = retrieveById(id).orElseThrow(IllegalArgumentException::new);
         manager.remove(toDelete);
     }
 
