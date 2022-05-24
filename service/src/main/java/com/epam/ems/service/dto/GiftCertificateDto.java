@@ -3,21 +3,24 @@ package com.epam.ems.service.dto;
 
 import com.epam.ems.service.validation.OnCreate;
 import com.epam.ems.service.validation.OnUpdate;
+import com.epam.ems.service.validation.custom.constraint.TagDtoListConstraint;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.hateoas.RepresentationModel;
 
-import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GiftCertificateDto implements DataTransferObject {
+public class GiftCertificateDto extends RepresentationModel<GiftCertificateDto> implements DataTransferObject {
 
     private Long id;
 
@@ -46,5 +49,7 @@ public class GiftCertificateDto implements DataTransferObject {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm'Z'")
     private LocalDateTime lastUpdateDate;
 
-    private @Valid List<TagDto> tags;
+    @NotNull(groups = OnCreate.class, message = "msg.taglist.null")
+    @TagDtoListConstraint(groups = {OnCreate.class,OnUpdate.class})
+    private Set<TagDto> tags;
 }

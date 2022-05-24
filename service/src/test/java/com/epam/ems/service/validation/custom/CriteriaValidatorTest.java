@@ -5,12 +5,12 @@ import com.epam.ems.dao.entity.criteria.Criteria;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CriteriaValidatorTest {
@@ -20,8 +20,8 @@ public class CriteriaValidatorTest {
     @Test
     void validateCorrectCriteria(){
         ConstraintValidatorContext context = Mockito.mock(ConstraintValidatorContext.class);
-        Map<String, String> valid = new LinkedHashMap<>();
-        valid.put(Criteria.ParamName.TAG_NAME.name(), "tag");
+        Map<String, Object> valid = new LinkedHashMap<>();
+        valid.put(Criteria.ParamName.TAG_NAMES.name(), List.of("tag","tog"));
         valid.put(Criteria.ParamName.ORDER_DATE_ASC.name(), "");
         valid.put(Criteria.ParamName.NAME_CONTAINS.name(), "anything");
 
@@ -31,7 +31,7 @@ public class CriteriaValidatorTest {
     @Test
     void validateIncorrectCriteria(){
         ConstraintValidatorContext context = Mockito.mock(ConstraintValidatorContext.class);
-        Map<String, String> valid = new LinkedHashMap<>();
+        Map<String, Object> valid = new LinkedHashMap<>();
         valid.put("I AM ERROR", "yeah");
         valid.put(Criteria.ParamName.ORDER_DATE_ASC.name(), "");
         valid.put(Criteria.ParamName.NAME_CONTAINS.name(), "anything");

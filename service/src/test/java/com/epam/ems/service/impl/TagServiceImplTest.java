@@ -2,7 +2,6 @@ package com.epam.ems.service.impl;
 
 import com.epam.ems.dao.TagDao;
 import com.epam.ems.dao.entity.Tag;
-import com.epam.ems.dao.impl.SqlTagDao;
 import com.epam.ems.service.dto.TagDto;
 import com.epam.ems.service.exception.DuplicateEntityException;
 import com.epam.ems.service.exception.NoSuchEntityException;
@@ -33,12 +32,13 @@ public class TagServiceImplTest {
 
     @Test
     void testGetAll(){
-        List<Tag> taglist = List.of(new Tag(1L,"tag1"),new Tag(2L,"Tag0"), new Tag(3L, "TAG"));
+        List<Tag> taglist = List.of(new Tag(1L,"tag1",null),
+                new Tag(2L,"Tag0",null), new Tag(3L, "TAG",null));
         List<TagDto> expected = taglist.stream().map(e->new TagDto(e.getId(), e.getName())).collect(Collectors.toList());
 
-        when(dao.retrieveAll()).thenReturn(taglist);
+        when(dao.retrieveAll(anyInt(),anyInt())).thenReturn(taglist);
         when(mapper.map(any())).thenCallRealMethod();
-        List<TagDto> actual = service.getAll();
+        List<TagDto> actual = service.getAll(5,5);
 
         assertEquals(expected, actual);
 
@@ -46,7 +46,7 @@ public class TagServiceImplTest {
 
     @Test
     void testGetByCorrectId(){
-        Tag toReturn = new Tag(15L,"got it");
+        Tag toReturn = new Tag(15L,"got it",null);
         TagDto expected = new TagDto(15L,"got it");
 
         when(dao.retrieveById(15L)).thenReturn(Optional.of(toReturn));
@@ -64,7 +64,7 @@ public class TagServiceImplTest {
 
     @Test
     void testGetByCorrectName(){
-        Tag toReturn = new Tag(15L,"this  name");
+        Tag toReturn = new Tag(15L,"this  name",null);
         TagDto expected = new TagDto(15L,"this  name");
 
         when(dao.findByName("this name")).thenReturn(Optional.of(toReturn));
@@ -84,7 +84,7 @@ public class TagServiceImplTest {
     @Test
     void testInsertNewEntity(){
         TagDto toCreate = new TagDto(13L,"Like a man is the mountainside");
-        when(dao.create(any())).thenReturn(1L);
+        when(dao.create(any())).thenReturn(new Tag());
 
         assertDoesNotThrow(()->service.insert(toCreate));
     }
@@ -92,7 +92,7 @@ public class TagServiceImplTest {
     @Test
     void testInsertDuplicateEntity(){
         TagDto duplicate = new TagDto(13L,"Like a man is the mountainside");
-        when(dao.findByName(anyString())).thenReturn(Optional.of(Tag.builder().build()));
+        when(dao.findByName(anyString())).thenReturn(Optional.of(Tag.builder().id(1L).build()));
 
         assertThrows(DuplicateEntityException.class, ()->service.insert(duplicate));
     }

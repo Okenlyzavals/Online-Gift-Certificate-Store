@@ -5,6 +5,13 @@ import com.epam.ems.service.dto.TagDto;
 import com.epam.ems.service.mapper.Mapper;
 import org.springframework.stereotype.Component;
 
+/**
+ * Extension of {@link Mapper} suited for
+ * {@link Tag} Entity and {@link TagDto} DTO.
+ *
+ * @author Baranouski Y. K.
+ * @version 1.0.0
+ */
 @Component
 public class TagDtoMapper implements Mapper<Tag, TagDto> {
 
