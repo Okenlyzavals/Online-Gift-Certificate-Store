@@ -1,0 +1,33 @@
+plugins{
+    id 'jacoco'
+}
+
+test {
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = false
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
+}
+
+dependencies {
+    implementation project(':dao')
+    implementation group: 'org.springframework', name: 'spring-tx', version: '5.3.19'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas', version: '2.6.7'
+
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.4'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'
+
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.4.0'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.4.0'
+
+    implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+    implementation group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.1.0.Final'
+
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
+}
