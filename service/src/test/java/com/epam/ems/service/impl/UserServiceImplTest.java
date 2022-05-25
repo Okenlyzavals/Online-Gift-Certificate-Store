@@ -22,7 +22,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceImplTest {
+class UserServiceImplTest {
 
     @Spy
     UserDtoMapper mapper = new UserDtoMapper();
@@ -48,7 +48,7 @@ public class UserServiceImplTest {
     void testGetByCorrectId(){
         User user = new User(1L,"user1","user1@mail.com","pass",null);
         UserDto expected = mapper.map(user);
-        when(userDao.retrieveById(eq(1L))).thenReturn(Optional.of(user));
+        when(userDao.retrieveById(1L)).thenReturn(Optional.of(user));
 
         UserDto actual = service.getById(1L);
 
@@ -64,7 +64,8 @@ public class UserServiceImplTest {
 
     @Test
     void testInsert(){
-        assertThrows(UnsupportedOperationException.class, ()->service.insert(new UserDto()));
+        UserDto dto = new UserDto();
+        assertThrows(UnsupportedOperationException.class, ()->service.insert(dto));
     }
 
     @Test
@@ -74,6 +75,7 @@ public class UserServiceImplTest {
 
     @Test
     void testDeleteEntity(){
-        assertThrows(UnsupportedOperationException.class, ()->service.delete(new UserDto()));
+        UserDto dto = new UserDto();
+        assertThrows(UnsupportedOperationException.class, ()->service.delete(dto));
     }
 }

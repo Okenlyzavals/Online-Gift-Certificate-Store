@@ -22,9 +22,9 @@ public abstract class ServiceException extends RuntimeException {
             Tag.class, 2,
             User.class, 3,
             Order.class, 4);
-    protected int errorCode;
+    protected final int errorCode;
 
-    public ServiceException(Class<?> entityClass, int errorCode){
+    protected ServiceException(Class<?> entityClass, int errorCode){
         this.errorCode = (errorCode * 100) + (ENTITY_ERROR_CODES.get(entityClass));
     }
 }

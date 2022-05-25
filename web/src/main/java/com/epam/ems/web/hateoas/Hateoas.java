@@ -2,6 +2,7 @@ package com.epam.ems.web.hateoas;
 
 import com.epam.ems.service.dto.DataTransferObject;
 import com.epam.ems.web.hateoas.constant.HateoasConstant;
+import com.epam.ems.web.hateoas.exception.HateoasException;
 import lombok.extern.java.Log;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.RepresentationModel;
@@ -34,8 +35,8 @@ public interface Hateoas<T extends RepresentationModel<? extends DataTransferObj
             prevPage = previousPageFuture.get();
             firstPage = firstPageFuture.get();
         } catch (InterruptedException | ExecutionException e) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, e.getMessage());
-            throw new RuntimeException(e);
+            Thread.currentThread().interrupt();
+            throw new HateoasException(e);
         }
 
         model.addIf(nextPage != null, ()->linkTo(nextPage).withRel(HateoasConstant.PAGE_NEXT));

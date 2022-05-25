@@ -2,6 +2,8 @@ package com.epam.ems.web.exception;
 
 import com.epam.ems.service.exception.DuplicateEntityException;
 import com.epam.ems.service.exception.NoSuchEntityException;
+import com.epam.ems.web.hateoas.Hateoas;
+import com.epam.ems.web.hateoas.exception.HateoasException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,7 @@ public class GiftCertificateExceptionHandler extends ResponseEntityExceptionHand
 
     private static final String MESSAGE_NOT_FOUND = "msg.error.not.found";
     private static final String MESSAGE_DUPLICATE = "msg.error.duplicate";
+    private static final String MESSAGE_HATEOAS = "msg.error.hateoas";
     private static final String MESSAGE_INTERNAL_ERROR = "msg.error.internal";
     private static final String MESSAGE_INVALID_ENTITY = "msg.error.invalid";
     private static final String MESSAGE_METHOD_NOT_SUPPORTED = "msg.error.unsupported.method";
@@ -49,6 +52,13 @@ public class GiftCertificateExceptionHandler extends ResponseEntityExceptionHand
         return new ApiErrorResponse(
                 e.getErrorCode(),
                 getLocalizedMessage(MESSAGE_DUPLICATE, locale)+"(id="+e.getId()+")");
+    }
+
+    @ExceptionHandler(HateoasException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiErrorResponse handleHateoasException(HateoasException e, WebRequest request){
+        Locale locale = request.getLocale();
+        return new ApiErrorResponse(400,getLocalizedMessage(MESSAGE_HATEOAS, locale));
     }
 
     @Override
