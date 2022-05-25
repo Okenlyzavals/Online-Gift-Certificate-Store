@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-public class TagServiceImplTest {
+class TagServiceImplTest {
 
     @Mock
     private TagDao dao;

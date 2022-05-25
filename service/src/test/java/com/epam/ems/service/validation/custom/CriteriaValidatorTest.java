@@ -13,7 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CriteriaValidatorTest {
+class CriteriaValidatorTest {
 
     private final CriteriaValidator validator = new CriteriaValidator();
 

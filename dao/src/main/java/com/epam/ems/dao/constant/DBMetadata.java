@@ -34,5 +34,6 @@ public final class DBMetadata {
     public static final String ORDER_HAS_CERT_TABLE_ID_ORDER="order_id";
     public static final String ORDER_HAS_CERT_TABLE_ID_CERT="cert_id";
 
+    private DBMetadata(){}
 
 }

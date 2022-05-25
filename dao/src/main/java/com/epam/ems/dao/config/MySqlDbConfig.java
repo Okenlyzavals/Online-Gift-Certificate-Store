@@ -15,6 +15,7 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.util.Properties;
 
 @Configuration
@@ -41,7 +42,7 @@ public class MySqlDbConfig {
 
     @Bean
     @Profile("prod")
-    public DataSource mysqlDataSource() throws Exception {
+    public DataSource mysqlDataSource() {
         BasicDataSource dataSource = new BasicDataSource();
 
         dataSource.setDriverClassName(environment.getProperty(DATABASE_DRIVER_CLASS_NAME));
@@ -54,7 +55,7 @@ public class MySqlDbConfig {
 
     @Autowired
     @Bean(name = "sessionFactory")
-    public SessionFactory getSessionFactory(DataSource dataSource) throws Exception {
+    public SessionFactory getSessionFactory(DataSource dataSource) throws IOException {
         Properties properties = new Properties();
 
         properties.put("hibernate.dialect", environment.getProperty(DATABASE_HIBERNATE_DIALECT));

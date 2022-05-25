@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("dev")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest
-public class TagDaoTest {
+class TagDaoTest {
 
     @Autowired
     TagDao dao;

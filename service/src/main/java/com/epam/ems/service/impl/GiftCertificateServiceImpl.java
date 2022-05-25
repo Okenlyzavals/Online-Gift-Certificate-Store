@@ -8,13 +8,17 @@ import com.epam.ems.dao.entity.criteria.Criteria;
 import com.epam.ems.service.GiftCertificateService;
 import com.epam.ems.service.dto.GiftCertificateDto;
 import com.epam.ems.service.exception.NoSuchEntityException;
+import com.epam.ems.service.exception.UpdateException;
 import com.epam.ems.service.mapper.Mapper;
+import org.apache.commons.beanutils.PropertyUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -64,13 +68,12 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Override
     @Transactional
     public void delete(Long id) throws NoSuchEntityException {
-        if(dao.retrieveById(id).isEmpty()){
-            throw new NoSuchEntityException(GiftCertificate.class);
-        }
+        dao.retrieveById(id).orElseThrow(()->new NoSuchEntityException(GiftCertificate.class));
         dao.delete(id);
     }
 
     @Override
+    @Transactional
     public void delete(GiftCertificateDto entity) throws NoSuchEntityException {
         delete(entity.getId());
     }
@@ -138,16 +141,21 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     private GiftCertificate getUpdatedCertificate(GiftCertificate oldCert, GiftCertificate updatedCert){
         GiftCertificate result = oldCert.toBuilder().build();
 
-        try {
-            for (Field field : updatedCert.getClass().getDeclaredFields()){
-                field.setAccessible(true);
-                if(field.get(updatedCert) != null && !field.get(updatedCert).equals(field.get(oldCert))){
-                    field.set(result, field.get(updatedCert));
-                }
-            }
-        } catch (IllegalAccessException e) {
-            result = oldCert;
+        try{
+            PropertyUtils.describe(updatedCert).entrySet().stream()
+                    .filter(p -> p.getValue() != null)
+                    .filter(p -> ! p.getKey().equals("class"))
+                    .forEach(p -> {
+                        try {
+                            PropertyUtils.setProperty(result, p.getKey(), p.getValue());
+                        } catch (Exception e) {
+                            throw new UpdateException(GiftCertificate.class);
+                        }
+                    });
+        } catch (Exception e){
+            throw new UpdateException(GiftCertificate.class);
         }
+
         return result;
     }
 }

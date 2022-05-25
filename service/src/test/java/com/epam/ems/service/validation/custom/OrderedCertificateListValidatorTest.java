@@ -8,7 +8,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class OrderedCertificateListValidatorTest {
+class OrderedCertificateListValidatorTest {
 
     private static final OrderedCertificateListValidator validator = new OrderedCertificateListValidator();
 
