@@ -1,7 +1,6 @@
 package com.epam.ems.service.validation.custom.constraint;
 
 import com.epam.ems.service.validation.custom.OrderDtoUserValidator;
-import com.epam.ems.service.validation.custom.TagDtoListValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

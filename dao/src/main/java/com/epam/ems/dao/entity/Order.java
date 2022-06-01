@@ -34,11 +34,11 @@ public class Order{
     @Column(name = DBMetadata.ORDER_TABLE_DATE)
     private LocalDateTime date;
 
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
     @JoinColumn(name = DBMetadata.ORDER_TABLE_USER, referencedColumnName = DBMetadata.USER_TABLE_ID)
     private User user;
 
-    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
     @JoinTable(
             name = DBMetadata.ORDER_HAS_CERT_TABLE,
             joinColumns = {@JoinColumn(name = DBMetadata.ORDER_HAS_CERT_TABLE_ID_ORDER)},

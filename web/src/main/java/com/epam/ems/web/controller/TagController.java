@@ -5,11 +5,8 @@ import com.epam.ems.service.dto.TagDto;
 import com.epam.ems.service.exception.DuplicateEntityException;
 import com.epam.ems.service.exception.NoSuchEntityException;
 import com.epam.ems.web.hateoas.Hateoas;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.server.core.LastInvocationAware;
-import org.springframework.hateoas.server.core.MethodInvocation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 

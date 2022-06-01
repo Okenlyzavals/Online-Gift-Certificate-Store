@@ -4,9 +4,7 @@ import com.epam.ems.dao.GiftCertificateDao;
 import com.epam.ems.dao.entity.GiftCertificate;
 import com.epam.ems.dao.entity.criteria.Criteria;
 import com.epam.ems.dao.querybuilder.CriteriaQueryBuilder;
-import org.hibernate.criterion.Order;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

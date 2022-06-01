@@ -2,7 +2,6 @@ package com.epam.ems.service.validation.custom;
 
 import com.epam.ems.service.dto.GiftCertificateDto;
 import com.epam.ems.service.validation.custom.constraint.OrderedCertificateListConstraint;
-import org.springframework.util.CollectionUtils;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

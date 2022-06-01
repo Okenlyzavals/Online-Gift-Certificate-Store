@@ -49,7 +49,7 @@ public class GiftCertificate{
     @Column(name = DBMetadata.CERTIFICATES_TABLE_LAST_UPDATE)
     private LocalDateTime lastUpdateDate;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(
             name = DBMetadata.CERT_HAS_TAG_TABLE,
             joinColumns = {@JoinColumn(name = DBMetadata.CERT_HAS_TAG_TABLE_ID_CERT,

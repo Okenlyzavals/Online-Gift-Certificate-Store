@@ -59,9 +59,9 @@ public class MySqlDbConfig {
         Properties properties = new Properties();
 
         properties.put("hibernate.dialect", environment.getProperty(DATABASE_HIBERNATE_DIALECT));
-        properties.put(DATABASE_SHOW_SQL, environment.getProperty(DATABASE_SHOW_SQL));
+        properties.put("hibernate.show_sql", environment.getProperty(DATABASE_SHOW_SQL));
         properties.put("hibernate.hbm2ddl.auto", environment.getProperty(DATABASE_DDL_AUTO));
-        properties.put(SESSION_CONTEXT_CLASS, environment.getProperty(SESSION_CONTEXT_CLASS));
+        properties.put("hibernate.current_session_context_class", environment.getProperty(SESSION_CONTEXT_CLASS));
 
         LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
         factoryBean.setPackagesToScan("");

@@ -11,19 +11,17 @@ import com.epam.ems.service.exception.NoSuchEntityException;
 import com.epam.ems.service.exception.UpdateException;
 import com.epam.ems.service.mapper.Mapper;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     private final GiftCertificateDao dao;
@@ -49,12 +47,11 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     public List<GiftCertificateDto> getAll(int page, int elements) {
         return dao.retrieveAll(page,elements)
                 .stream()
-                .map(e->mapper.map(e))
+                .map(mapper::map)
                 .collect(Collectors.toList());
     }
 
     @Override
-    @Transactional
     public GiftCertificateDto insert(GiftCertificateDto entity){
         entity.setLastUpdateDate(LocalDateTime.now());
         entity.setId(null);
@@ -66,14 +63,13 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    @Transactional
     public void delete(Long id) throws NoSuchEntityException {
-        dao.retrieveById(id).orElseThrow(()->new NoSuchEntityException(GiftCertificate.class));
-        dao.delete(id);
+        dao.retrieveById(id).ifPresentOrElse(
+                e->dao.delete(id),
+                ()-> {throw new NoSuchEntityException(GiftCertificate.class);});
     }
 
     @Override
-    @Transactional
     public void delete(GiftCertificateDto entity) throws NoSuchEntityException {
         delete(entity.getId());
     }
@@ -82,12 +78,11 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     public List<GiftCertificateDto> getByCriteria(Map<String,Object> criteria, int page, int elements) {
         return dao.retrieveByCriteria(mapToCriteria(criteria),page,elements)
                 .stream()
-                .map(e->mapper.map(e))
+                .map(mapper::map)
                 .collect(Collectors.toList());
     }
 
     @Override
-    @Transactional
     public GiftCertificateDto update(GiftCertificateDto entity) throws NoSuchEntityException {
 
         GiftCertificate oldCert = dao.retrieveById(entity.getId())

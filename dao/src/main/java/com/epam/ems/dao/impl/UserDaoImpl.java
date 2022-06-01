@@ -1,9 +1,7 @@
 package com.epam.ems.dao.impl;
 
 import com.epam.ems.dao.UserDao;
-import com.epam.ems.dao.entity.Order;
 import com.epam.ems.dao.entity.User;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -2,7 +2,6 @@ package com.epam.ems.web.exception;
 
 import com.epam.ems.service.exception.DuplicateEntityException;
 import com.epam.ems.service.exception.NoSuchEntityException;
-import com.epam.ems.web.hateoas.Hateoas;
 import com.epam.ems.web.hateoas.exception.HateoasException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -109,6 +108,7 @@ public class GiftCertificateExceptionHandler extends ResponseEntityExceptionHand
                 HttpStatus.METHOD_NOT_ALLOWED);
 
     }
+
 
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {

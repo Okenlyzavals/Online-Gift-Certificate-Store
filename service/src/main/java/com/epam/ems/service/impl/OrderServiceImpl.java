@@ -5,16 +5,13 @@ import com.epam.ems.dao.OrderDao;
 import com.epam.ems.dao.UserDao;
 import com.epam.ems.dao.entity.GiftCertificate;
 import com.epam.ems.dao.entity.Order;
-import com.epam.ems.dao.entity.Tag;
 import com.epam.ems.dao.entity.User;
 import com.epam.ems.service.OrderService;
 import com.epam.ems.service.dto.OrderDto;
-import com.epam.ems.service.dto.UserDto;
 import com.epam.ems.service.exception.DuplicateEntityException;
 import com.epam.ems.service.exception.NoSuchEntityException;
 import com.epam.ems.service.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class OrderServiceImpl implements OrderService {
 
     private final OrderDao dao;
@@ -54,7 +52,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
     public OrderDto insert(OrderDto entity) throws DuplicateEntityException {
         Order order = mapper.extract(entity);
         order.setId(null);
@@ -65,8 +62,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void delete(Long id) throws NoSuchEntityException {
-        dao.retrieveById(id).orElseThrow(()->new NoSuchEntityException(Order.class));
-        dao.delete(id);
+        dao.retrieveById(id).ifPresentOrElse(
+                e->dao.delete(id),
+                ()-> {throw new NoSuchEntityException(Order.class);});
     }
 
     @Override
@@ -75,11 +73,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
     public List<OrderDto> getOrdersByUser(Long id, int page, int elements) throws NoSuchEntityException {
 
-        userDao.retrieveById(id).orElseThrow(()->new NoSuchEntityException(User.class));
-        return dao.retrieveByUserId(id,page,elements).stream().map(mapper::map).collect(Collectors.toList());
+        User user =  userDao.retrieveById(id).orElseThrow(()->new NoSuchEntityException(User.class));
+        return dao.retrieveByUserId(
+                user.getId(),
+                page,
+                elements).stream().map(mapper::map).collect(Collectors.toList());
     }
 
     private Set<GiftCertificate> getCertificatesPreparedForDbOperations(Order order){

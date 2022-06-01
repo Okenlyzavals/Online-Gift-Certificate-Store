@@ -9,7 +9,6 @@ import com.epam.ems.service.dto.UserDto;
 import com.epam.ems.service.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import java.util.stream.Collectors;
 

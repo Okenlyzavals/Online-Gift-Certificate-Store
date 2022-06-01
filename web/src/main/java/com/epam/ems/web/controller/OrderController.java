@@ -2,7 +2,6 @@ package com.epam.ems.web.controller;
 
 import com.epam.ems.service.OrderService;
 import com.epam.ems.service.dto.OrderDto;
-import com.epam.ems.service.dto.UserDto;
 import com.epam.ems.web.hateoas.Hateoas;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;

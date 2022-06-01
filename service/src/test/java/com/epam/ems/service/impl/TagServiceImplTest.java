@@ -118,6 +118,7 @@ class TagServiceImplTest {
     @Test
     void testDeleteMissingEntity(){
         when(dao.retrieveById(anyLong())).thenReturn(Optional.empty());
-        assertThrows(NoSuchEntityException.class, ()->service.delete(new TagDto(1L,"")));
+        TagDto toDelete = new TagDto(1L,"del");
+        assertThrows(NoSuchEntityException.class, ()->service.delete(toDelete));
     }
 }

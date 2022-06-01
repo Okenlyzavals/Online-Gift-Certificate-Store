@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "certificates.fillDB",
+      "type": "java.lang.Boolean",
+      "description": "Indicates if the application should fill database with data"
+  }
+] }
