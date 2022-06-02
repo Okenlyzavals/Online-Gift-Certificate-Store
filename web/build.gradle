@@ -1,5 +1,6 @@
 plugins {
     id 'war'
+    id 'application'
 }
 
 group 'com.epam.ems'
@@ -10,15 +11,24 @@ dependencies {
     compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
 
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas', version: '2.7.0'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '2.6.7'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.6.7'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '2.7.0'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.7.0'
 
     implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
     implementation group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.1.0.Final'
 
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.4'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'
+    implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+    implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
+
     implementation group: 'org.springframework.data', name: 'spring-data-commons', version: '2.7.0'
+    implementation group: 'org.springframework.data', name: 'spring-data-jpa', version: '2.7.0'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-autoconfigure', version: '2.7.0'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.7.0'
 
+}
 
+application {
+    mainClass.set('com.epam.ems.web.SpringBootApp')
 }

@@ -4,26 +4,23 @@ import com.epam.ems.service.DatasourceFiller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
-@SpringBootApplication(exclude = {
-        DataSourceAutoConfiguration.class,
-        DataSourceTransactionManagerAutoConfiguration.class,
-        HibernateJpaAutoConfiguration.class },
-    scanBasePackages = "com.epam.ems")
+@SpringBootApplication(scanBasePackages = {"com.epam.ems"})
 @EnableSpringDataWebSupport
+@EnableJpaRepositories("com.epam.ems.dao")
+@EntityScan("com.epam.ems.dao.entity")
 @Component
 public class SpringBootApp {
 
-    private DatasourceFiller filler;
-    private Environment environment;
+    private final DatasourceFiller filler;
+    private final Environment environment;
 
     @Autowired
     public SpringBootApp(DatasourceFiller filler, Environment environment) {

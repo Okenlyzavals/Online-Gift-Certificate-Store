@@ -2,6 +2,8 @@ package com.epam.ems.dao.entity;
 
 import com.epam.ems.dao.audit.AuditEntityListener;
 import com.epam.ems.dao.constant.DBMetadata;
+import com.epam.ems.dao.entity.role.Role;
+import com.epam.ems.dao.entity.role.RoleConverter;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -35,11 +37,16 @@ public class User{
     @Column(name = DBMetadata.USER_TABLE_PASSWORD)
     private String password;
 
+    @Convert(converter = RoleConverter.class)
+    @Column(name = "id_role")
+    private Role role;
+
     @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
             fetch = FetchType.LAZY,
             orphanRemoval = true, mappedBy = "user")
     @ToString.Exclude
     private Set<Order> orders;
+
 
     @Override
     public boolean equals(Object o) {

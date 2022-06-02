@@ -19,7 +19,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderDto extends RepresentationModel<OrderDto> implements DataTransferObject{
+public class OrderDto extends RepresentationModel<OrderDto> {
 
     private Long id;
 

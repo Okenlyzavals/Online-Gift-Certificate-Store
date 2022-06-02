@@ -13,7 +13,7 @@ import javax.validation.constraints.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TagDto extends RepresentationModel<TagDto> implements DataTransferObject {
+public class TagDto extends RepresentationModel<TagDto> {
 
     private Long id;
 

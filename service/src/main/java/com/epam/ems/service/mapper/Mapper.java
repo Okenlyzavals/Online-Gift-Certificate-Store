@@ -1,13 +1,11 @@
 package com.epam.ems.service.mapper;
 
-import com.epam.ems.service.dto.DataTransferObject;
-
 /**
  * Interface that specifies behavior for DTO mapper objects.
  * @param <E> Type of entity to map to/extracted from DTO.
  * @param <D> Type of DTO to map entity to/extract entity from.
  */
-public interface Mapper<E, D extends DataTransferObject> {
+public interface Mapper<E, D> {
 
     /**
      * Maps Entity tu DTO.

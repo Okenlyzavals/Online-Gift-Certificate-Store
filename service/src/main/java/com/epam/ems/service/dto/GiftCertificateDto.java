@@ -20,7 +20,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GiftCertificateDto extends RepresentationModel<GiftCertificateDto> implements DataTransferObject {
+public class GiftCertificateDto extends RepresentationModel<GiftCertificateDto> {
 
     private Long id;
 

@@ -9,12 +9,16 @@ import com.epam.ems.service.exception.NoSuchEntityException;
 import com.epam.ems.service.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl
+        implements UserService, UserDetailsService {
 
     private final UserDao dao;
     private final Mapper<User, UserDto> mapper;
@@ -43,7 +47,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto insert(UserDto entity) throws DuplicateEntityException {
-        throw new UnsupportedOperationException();
+        entity.setId(null);
+        entity.setRole(UserDto.Role.USER);
+
+        dao.findDistinctByUsername(entity.getUsername())
+                .ifPresent(e->{throw new DuplicateEntityException(e.getId(),User.class);});
+        return mapper.map(dao.save(mapper.extract(entity)));
     }
 
     @Override
@@ -54,5 +63,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(UserDto entity) throws NoSuchEntityException {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return mapper.map(dao.findDistinctByUsername(username)
+                .orElseThrow(()->new UsernameNotFoundException("msg.error.not.found")));
     }
 }
