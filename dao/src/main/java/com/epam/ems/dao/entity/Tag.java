@@ -20,7 +20,7 @@ import java.util.Objects;
 @Table(name = DBMetadata.TAG_TABLE)
 @EntityListeners(AuditEntityListener.class)
 @NamedStoredProcedureQuery(
-        name="GetMostUsedTag",
+        name="Tag.GetMostUsedTag",
         procedureName="GetMostUsedTag",
         resultClasses = { Tag.class }
 )

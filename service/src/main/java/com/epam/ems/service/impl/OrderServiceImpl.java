@@ -12,11 +12,12 @@ import com.epam.ems.service.exception.DuplicateEntityException;
 import com.epam.ems.service.exception.NoSuchEntityException;
 import com.epam.ems.service.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -40,15 +41,17 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDto getById(Long id) throws NoSuchEntityException {
-        return mapper.map(dao.retrieveById(id).orElseThrow(()->new NoSuchEntityException(Order.class)));
+        return mapper.map(dao.findById(id).orElseThrow(()->new NoSuchEntityException(Order.class)));
     }
 
     @Override
-    public List<OrderDto> getAll(int page, int elements) {
-        return dao.retrieveAll(page,elements)
-                .stream()
-                .map(mapper::map)
-                .collect(Collectors.toList());
+    public Page<OrderDto> getAll(int page, int elements) {
+        Pageable request = PageRequest.of(page,elements, Sort.by(Sort.Direction.ASC, "id"));
+        Page<Order> result =  dao.findAll(request);
+        return new PageImpl<>(
+                result.stream().map(mapper::map).collect(Collectors.toList()),
+                request,
+                result.getTotalElements());
     }
 
     @Override
@@ -57,13 +60,18 @@ public class OrderServiceImpl implements OrderService {
         order.setId(null);
         order.setCertificates(getCertificatesPreparedForDbOperations(order));
         order.setUser(getUserForDbOperation(order));
-        return mapper.map(dao.create(order));
+        order.setPrice(
+                order.getCertificates().stream()
+                        .map(GiftCertificate::getPrice)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
+        return mapper.map(dao.save(order));
     }
 
     @Override
     public void delete(Long id) throws NoSuchEntityException {
-        dao.retrieveById(id).ifPresentOrElse(
-                e->dao.delete(id),
+        dao.findById(id).ifPresentOrElse(
+                e->dao.deleteById(id),
                 ()-> {throw new NoSuchEntityException(Order.class);});
     }
 
@@ -73,25 +81,28 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDto> getOrdersByUser(Long id, int page, int elements) throws NoSuchEntityException {
+    public Page<OrderDto> getOrdersByUser(Long id, int page, int elements) throws NoSuchEntityException {
 
-        User user =  userDao.retrieveById(id).orElseThrow(()->new NoSuchEntityException(User.class));
-        return dao.retrieveByUserId(
-                user.getId(),
-                page,
-                elements).stream().map(mapper::map).collect(Collectors.toList());
+        User user =  userDao.findById(id).orElseThrow(()->new NoSuchEntityException(User.class));
+
+        Pageable request = PageRequest.of(page,elements, Sort.by(Sort.Direction.ASC, "id"));
+        Page<Order> result =  dao.findAllByUserId(user.getId(), request);
+        return new PageImpl<>(
+                result.stream().map(mapper::map).collect(Collectors.toList()),
+                request,
+                result.getTotalElements());
     }
 
     private Set<GiftCertificate> getCertificatesPreparedForDbOperations(Order order){
         Set<GiftCertificate> preparedCerts = new HashSet<>();
         for (GiftCertificate certificate : order.getCertificates()){
-            certDao.retrieveById(certificate.getId()).ifPresent(preparedCerts::add);
+            certDao.findById(certificate.getId()).ifPresent(preparedCerts::add);
         }
         return preparedCerts;
     }
 
     private User getUserForDbOperation(Order order){
-        return userDao.retrieveById(order.getUser().getId())
+        return userDao.findById(order.getUser().getId())
                 .orElseThrow(()->new NoSuchEntityException(User.class));
     }
 }

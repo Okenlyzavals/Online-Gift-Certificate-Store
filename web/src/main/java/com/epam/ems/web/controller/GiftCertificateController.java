@@ -6,9 +6,11 @@ import com.epam.ems.service.exception.NoSuchEntityException;
 import com.epam.ems.service.validation.OnCreate;
 import com.epam.ems.service.validation.OnUpdate;
 import com.epam.ems.service.validation.custom.constraint.CriteriaConstraint;
-import com.epam.ems.web.hateoas.Hateoas;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 import java.util.Map;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * API class for basic operations with gift certificates.
@@ -33,47 +32,41 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class GiftCertificateController {
 
     private final GiftCertificateService giftCertificateService;
-    private final Hateoas<GiftCertificateDto> hateoas;
+    private final RepresentationModelAssembler<GiftCertificateDto, GiftCertificateDto> hateoas;
 
     @Autowired
     public GiftCertificateController(GiftCertificateService giftCertificateService,
-                                     Hateoas<GiftCertificateDto> hateoas) {
+                                     RepresentationModelAssembler<GiftCertificateDto, GiftCertificateDto> hateoas) {
         this.giftCertificateService = giftCertificateService;
         this.hateoas = hateoas;
     }
 
     @GetMapping
-    public CollectionModel<GiftCertificateDto> getAllCerts(
-            @RequestParam(defaultValue = "1") @Min(1) int page,
-            @RequestParam(defaultValue = "5") @Min(1)int elements){
-        List<GiftCertificateDto> certs = giftCertificateService.getAll(page,elements);
-        certs.forEach(hateoas::buildHateoas);
-        return hateoas.buildPaginationModel(certs,
-                ()->page < 2 ? null : methodOn(getClass()).getAllCerts(1,elements),
-                ()->certs.size() < elements ? null : methodOn(getClass()).getAllCerts(page+1, elements),
-                ()->page < 2 ? null : methodOn(getClass()).getAllCerts(page-1, elements));
+    public PagedModel<GiftCertificateDto> getAllCerts(
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "5") @Min(1) int size,
+            PagedResourcesAssembler<GiftCertificateDto> assembler){
+        Page<GiftCertificateDto> certs = giftCertificateService.getAll(page, size);
+        return assembler.toModel(certs,hateoas);
     }
 
     @GetMapping("/{id}")
     public GiftCertificateDto getCertificate(
             @PathVariable @Min(value = 1, message = "msg.id.negative") long id) throws NoSuchEntityException {
-        return hateoas.buildHateoas(giftCertificateService.getById(id));
+        return hateoas.toModel(giftCertificateService.getById(id));
     }
 
     @GetMapping("/criteria")
-    public CollectionModel<GiftCertificateDto> getCertificatesByCriteria(
+    public PagedModel<GiftCertificateDto> getCertificatesByCriteria(
             @RequestBody
             @NotNull(message = "msg.dto.null")
             @CriteriaConstraint Map<String,Object> criteria,
-            @RequestParam(defaultValue = "1") @Min(1) int page,
-            @RequestParam(defaultValue = "5") @Min(1)int elements){
-        List<GiftCertificateDto> certs = giftCertificateService.getByCriteria(criteria,page,elements);
-        certs.forEach(hateoas::buildHateoas);
-        return hateoas.buildPaginationModel(certs,
-                ()->page < 2 ? null : methodOn(getClass()).getCertificatesByCriteria(criteria,1,elements),
-                ()->certs.size() < elements ? null : methodOn(getClass()).getCertificatesByCriteria(criteria,page+1, elements),
-                ()->page < 2 ? null : methodOn(getClass()).getCertificatesByCriteria(criteria,page-1, elements));
-    }
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "5") @Min(1) int size,
+            PagedResourcesAssembler<GiftCertificateDto> assembler){
+        Page<GiftCertificateDto> certs = giftCertificateService.getByCriteria(criteria,page, size);
+        return assembler.toModel(certs, hateoas);
+        }
 
     @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
@@ -82,7 +75,7 @@ public class GiftCertificateController {
             @NotNull(message = "msg.dto.null")
             @Validated({OnCreate.class})
                     GiftCertificateDto toCreate){
-        return hateoas.buildHateoas(giftCertificateService.insert(toCreate));
+        return hateoas.toModel(giftCertificateService.insert(toCreate));
     }
 
     @PatchMapping(value = "/{id}",
@@ -94,7 +87,7 @@ public class GiftCertificateController {
                                  @Validated(OnUpdate.class) GiftCertificateDto toUpdate)
             throws NoSuchEntityException{
         toUpdate.setId(id);
-        return hateoas.buildHateoas(giftCertificateService.update(toUpdate));
+        return hateoas.toModel(giftCertificateService.update(toUpdate));
     }
 
     @DeleteMapping("/{id}")

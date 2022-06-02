@@ -8,9 +8,9 @@ import com.epam.ems.service.exception.DuplicateEntityException;
 import com.epam.ems.service.exception.NoSuchEntityException;
 import com.epam.ems.service.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,16 +27,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getById(Long id) throws NoSuchEntityException {
-        return mapper.map(dao.retrieveById(id)
+        return mapper.map(dao.findById(id)
                 .orElseThrow(()->new NoSuchEntityException(User.class)));
     }
 
     @Override
-    public List<UserDto> getAll(int page, int elements) {
-        return dao.retrieveAll(page,elements)
-                .stream()
-                .map(mapper::map)
-                .collect(Collectors.toList());
+    public Page<UserDto> getAll(int page, int elements) {
+        Pageable request = PageRequest.of(page,elements, Sort.by(Sort.Direction.ASC, "id"));
+        Page<User> result =  dao.findAll(request);
+        return new PageImpl<>(
+                result.stream().map(mapper::map).collect(Collectors.toList()),
+                request,
+                result.getTotalElements());
     }
 
     @Override

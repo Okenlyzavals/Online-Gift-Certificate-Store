@@ -1,15 +1,14 @@
 package com.epam.ems.dao;
 
 import com.epam.ems.dao.entity.Tag;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
+import org.springframework.stereotype.Repository;
+
 import java.util.Optional;
 
-/**
- * Extension of {@link AbstractDao} suited for {@link Tag} entities.
- *
- * @author Baranouski Y. K.
- * @version 1.0.0
- */
-public interface TagDao extends AbstractDao<Tag>{
+@Repository
+public interface TagDao extends JpaRepository<Tag, Long> {
 
     /**
      * Retrieves tag from data source by its name.
@@ -17,7 +16,7 @@ public interface TagDao extends AbstractDao<Tag>{
      * @return {@link Optional} of tag with this name.
      * If no tag was found, returns empty {@link Optional}
      */
-    Optional<Tag> findByName(String name);
+    Optional<Tag> findDistinctByName(String name);
 
     /**
      * Retrieves the tag that is most widely used
@@ -25,5 +24,6 @@ public interface TagDao extends AbstractDao<Tag>{
      * @return {@link Optional} of such tag.
      * If no tag was found, returns empty {@link Optional}
      */
+    @Procedure(name = "Tag.GetMostUsedTag")
     Optional<Tag> findMostUsedTagOfUserWithHighestOrderCost();
 }

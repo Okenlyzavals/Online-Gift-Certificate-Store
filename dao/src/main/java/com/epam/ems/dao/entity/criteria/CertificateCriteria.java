@@ -4,7 +4,7 @@ import lombok.Getter;
 import java.util.LinkedHashMap;
 
 @Getter
-public class Criteria extends LinkedHashMap<Criteria.ParamName, Object> {
+public class CertificateCriteria extends LinkedHashMap<CertificateCriteria.ParamName, Object> {
 
     public enum ParamName{
         TAG_NAMES, NAME_CONTAINS,

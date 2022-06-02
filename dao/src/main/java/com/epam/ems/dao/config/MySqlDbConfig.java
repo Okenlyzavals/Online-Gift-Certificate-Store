@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
@@ -20,6 +21,7 @@ import java.util.Properties;
 
 @Configuration
 @EnableTransactionManagement
+@EnableJpaRepositories(basePackages = {"com.epam.ems.dao"})
 @PropertySource("classpath:application.properties")
 public class MySqlDbConfig {
 
@@ -54,8 +56,8 @@ public class MySqlDbConfig {
     }
 
     @Autowired
-    @Bean(name = "sessionFactory")
-    public SessionFactory getSessionFactory(DataSource dataSource) throws IOException {
+    @Bean
+    public SessionFactory entityManagerFactory(DataSource dataSource) throws IOException {
         Properties properties = new Properties();
 
         properties.put("hibernate.dialect", environment.getProperty(DATABASE_HIBERNATE_DIALECT));
@@ -79,8 +81,8 @@ public class MySqlDbConfig {
         return builder
                 .setType(EmbeddedDatabaseType.H2)
                 .setScriptEncoding("UTF-8")
-                .addScript("structure.sql")
-                .addScript("data.sql")
+                .addScript("schema.sql")
+                .addScript("data-h2.sql")
                 .build();
     }
 

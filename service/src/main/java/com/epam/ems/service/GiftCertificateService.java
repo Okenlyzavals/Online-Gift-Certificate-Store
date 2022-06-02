@@ -3,8 +3,8 @@ package com.epam.ems.service;
 import com.epam.ems.service.dto.GiftCertificateDto;
 import com.epam.ems.service.exception.NoSuchEntityException;
 import com.epam.ems.service.exception.UpdateException;
+import org.springframework.data.domain.Page;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,7 +26,7 @@ public interface GiftCertificateService extends AbstractService<GiftCertificateD
      * @return List of {@link GiftCertificateDto} instances (trimmed to fit page & elements)
      * matching given criteria.
      */
-    List<GiftCertificateDto> getByCriteria(Map<String, Object> criteria, int page, int elements);
+    Page<GiftCertificateDto> getByCriteria(Map<String, Object> criteria, int page, int elements);
 
     /**
      * Updates given certificate in Data Source.

@@ -1,6 +1,6 @@
 package com.epam.ems.service.validation.custom;
 
-import com.epam.ems.dao.entity.criteria.Criteria;
+import com.epam.ems.dao.entity.criteria.CertificateCriteria;
 import com.epam.ems.service.validation.custom.constraint.CriteriaConstraint;
 
 import javax.validation.ConstraintValidator;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class CriteriaValidator implements ConstraintValidator<CriteriaConstraint, Map<String,Object>>{
 
     private static final List<String> CRITERIA_PARAM_NAMES =
-            Arrays.stream(Criteria.ParamName.values())
+            Arrays.stream(CertificateCriteria.ParamName.values())
                     .map(Enum::name)
                     .collect(Collectors.toList());
 
@@ -33,12 +33,12 @@ public class CriteriaValidator implements ConstraintValidator<CriteriaConstraint
     }
 
     private boolean validateNotTagNameSearch(String key, Map<String, Object> value){
-        return key.equals(Criteria.ParamName.TAG_NAMES.name())
+        return key.equals(CertificateCriteria.ParamName.TAG_NAMES.name())
                 || value.get(key) instanceof String;
     }
 
     private boolean validateTagNameSearch(String key, Map<String, Object> value){
-        return !key.equals(Criteria.ParamName.TAG_NAMES.name())
+        return !key.equals(CertificateCriteria.ParamName.TAG_NAMES.name())
                 || (value.get(key) instanceof List
                     && !((List<?>) value.get(key)).isEmpty()
                     && ((List<?>) value.get(key)).get(0) instanceof String);

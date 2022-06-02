@@ -1,25 +1,13 @@
 package com.epam.ems.dao;
 
 import com.epam.ems.dao.entity.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
+@Repository
+public interface OrderDao extends JpaRepository<Order,Long> {
 
-/**
- * Extension of {@link AbstractDao} suited for {@link Order} entities.
- *
- * @author Baranouski Y. K.
- * @version 1.0.0
- */
-public interface OrderDao extends AbstractDao<Order> {
-
-    /**
-     * Retrieves list of orders from data source
-     * that were made by user with given ID.
-     * @param id ID of user to retrieve orders from.
-     * @param page Page to start displaying from.
-     * @param elements Number of elements per page.
-     * @return  List of {@link Order} instances (trimmed to fit page & elements)
-     * that were made by user with given ID.
-     */
-    List<Order> retrieveByUserId(Long id, int page, int elements);
+    Page<Order> findAllByUserId(Long id, Pageable pageable);
 }

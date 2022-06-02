@@ -3,8 +3,7 @@ package com.epam.ems.service;
 import com.epam.ems.service.dto.DataTransferObject;
 import com.epam.ems.service.exception.DuplicateEntityException;
 import com.epam.ems.service.exception.NoSuchEntityException;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 /**
  * An interface for service objects, providing support for CRD operations.
@@ -30,7 +29,7 @@ public interface AbstractService<T extends DataTransferObject> {
      * @return List of all entities (trimmed to fit page & elements) retrieved from Data Source,
      * each one being wrapped in corresponding DTO.
      */
-    List<T> getAll(int page, int elements);
+    Page<T> getAll(int page, int elements);
 
     /**
      * Saves entity to Data Source.
