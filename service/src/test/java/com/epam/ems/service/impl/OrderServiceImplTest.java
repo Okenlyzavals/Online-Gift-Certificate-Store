@@ -6,6 +6,7 @@ import com.epam.ems.dao.UserDao;
 import com.epam.ems.dao.entity.GiftCertificate;
 import com.epam.ems.dao.entity.Order;
 import com.epam.ems.dao.entity.User;
+import com.epam.ems.dao.entity.role.Role;
 import com.epam.ems.service.dto.GiftCertificateDto;
 import com.epam.ems.service.dto.OrderDto;
 import com.epam.ems.service.dto.UserDto;
@@ -20,6 +21,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -51,22 +55,22 @@ class OrderServiceImplTest {
     void getAllTest(){
         List<Order> orders = List.of(Order.builder()
                 .id(1L).date(LocalDateTime.MIN).price(new BigDecimal(1000))
-                        .user(User.builder().id(1L).build())
+                        .user(User.builder().role(Role.USER).id(1L).build())
                         .certificates(Set.of(GiftCertificate.builder().id(1L).build(),
                                 GiftCertificate.builder().id(2L).build(),
                                 GiftCertificate.builder().id(3L).build()))
                 .build(),
                 Order.builder()
                         .id(2L).date(LocalDateTime.MIN).price(new BigDecimal(1500))
-                        .user(User.builder().id(2L).build())
+                        .user(User.builder().id(2L).role(Role.USER).build())
                         .certificates(Set.of(GiftCertificate.builder().id(4L).build(),
                                 GiftCertificate.builder().id(2L).build(),
                                 GiftCertificate.builder().id(3L).build()))
                         .build());
         List<OrderDto> expected = orders.stream().map(mapper::map).collect(Collectors.toList());
-        when(orderDao.retrieveAll(anyInt(), anyInt())).thenReturn(orders);
+        when(orderDao.findAll((Pageable) any())).thenReturn(new PageImpl<>(orders));
 
-        List<OrderDto> actual = orderService.getAll(1,100);
+        List<OrderDto> actual = orderService.getAll(1,100).toList();
 
         assertEquals(expected, actual);
     }
@@ -75,14 +79,14 @@ class OrderServiceImplTest {
     void getByCorrectIdTest(){
         Optional<Order> order = Optional.of(Order.builder()
                 .id(1L).date(LocalDateTime.MIN).price(new BigDecimal(1000))
-                .user(User.builder().id(1L).build())
+                .user(User.builder().role(Role.USER).id(1L).build())
                 .certificates(Set.of(
                         GiftCertificate.builder().id(1L).build(),
                         GiftCertificate.builder().id(2L).build(),
                         GiftCertificate.builder().id(3L).build()))
                 .build());
         OrderDto expected = mapper.map(order.get());
-        when(orderDao.retrieveById(anyLong())).thenReturn(order);
+        when(orderDao.findById(anyLong())).thenReturn(order);
 
         OrderDto actual = orderService.getById(1L);
 
@@ -91,7 +95,7 @@ class OrderServiceImplTest {
 
     @Test
     void getByIncorrectIdTest(){
-        when(orderDao.retrieveById(anyLong())).thenReturn(Optional.empty());
+        when(orderDao.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(NoSuchEntityException.class, ()->orderService.getById(1L));
     }
@@ -100,30 +104,30 @@ class OrderServiceImplTest {
     void getByUserTest(){
         List<Order> orders = List.of(Order.builder()
                         .id(1L).date(LocalDateTime.MIN).price(new BigDecimal(1000))
-                        .user(User.builder().id(1L).build())
+                        .user(User.builder().role(Role.USER).id(1L).build())
                         .certificates(Set.of(GiftCertificate.builder().id(1L).build(),
                                 GiftCertificate.builder().id(2L).build(),
                                 GiftCertificate.builder().id(3L).build()))
                         .build(),
                 Order.builder()
                         .id(1L).date(LocalDateTime.MIN).price(new BigDecimal(1500))
-                        .user(User.builder().id(2L).build())
+                        .user(User.builder().role(Role.USER).id(2L).build())
                         .certificates(Set.of(GiftCertificate.builder().id(4L).build(),
                                 GiftCertificate.builder().id(2L).build(),
                                 GiftCertificate.builder().id(3L).build()))
                         .build());
         List<OrderDto> expected = orders.stream().map(mapper::map).collect(Collectors.toList());
-        when(userDao.retrieveById(anyLong())).thenReturn(Optional.of(User.builder().id(1L).build()));
-        when(orderDao.retrieveByUserId(anyLong(),anyInt(),anyInt())).thenReturn(orders);
+        when(userDao.findById(anyLong())).thenReturn(Optional.of(User.builder().id(1L).build()));
+        when(orderDao.findAllByUserId(anyLong(),any())).thenReturn(new PageImpl<>(orders));
 
-        List<OrderDto> actual = orderService.getOrdersByUser(1L,1,100);
+        List<OrderDto> actual = orderService.getOrdersByUser(1L,1,100).toList();
 
         assertEquals(expected, actual);
     }
 
     @Test
     void getByIncorrectUserTest(){
-        when(userDao.retrieveById(anyLong())).thenReturn(Optional.empty());
+        when(userDao.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(NoSuchEntityException.class, ()->orderService.getOrdersByUser(1L,1,100));
     }
@@ -131,27 +135,27 @@ class OrderServiceImplTest {
     @Test
     void insertNewTest(){
         OrderDto toInsert = new OrderDto(1L,new BigDecimal(1000),LocalDateTime.MIN,
-                new UserDto(1L,null,null,null),
-                List.of(new GiftCertificateDto(1L,null,null,null,null,null,null,null),
-                        new GiftCertificateDto(2L,null,null,null,null,null,null,null),
-                        new GiftCertificateDto(3L,null,null,null,null,null,null,null)));
-        when(userDao.retrieveById(anyLong())).thenReturn(Optional.of(User.builder().build()));
-        when(giftCertificateDao.retrieveById(anyLong()))
-                .thenReturn(Optional.of(GiftCertificate.builder().build()));
-        when(orderDao.create(any())).thenReturn(Order.builder().certificates(Set.of()).build());
+                new UserDto(1L,null,null,null, UserDto.Role.USER),
+                List.of(new GiftCertificateDto(1L,null,null,BigDecimal.ONE,null,null,null,null),
+                        new GiftCertificateDto(2L,null,null,BigDecimal.ONE,null,null,null,null),
+                        new GiftCertificateDto(3L,null,null,BigDecimal.ONE,null,null,null,null)));
+        when(userDao.findById(anyLong())).thenReturn(Optional.of(User.builder().build()));
+        when(giftCertificateDao.findById(anyLong()))
+                .thenReturn(Optional.of(GiftCertificate.builder().price(BigDecimal.ONE).build()));
+        when(orderDao.save(any())).thenReturn(Order.builder().price(new BigDecimal("3.0")).certificates(Set.of()).build());
 
         assertDoesNotThrow(()->orderService.insert(toInsert));
     }
 
     @Test
     void deleteExistingByIdTest(){
-        when(orderDao.retrieveById(anyLong())).thenReturn(Optional.of(Order.builder().build()));
+        when(orderDao.findById(anyLong())).thenReturn(Optional.of(Order.builder().build()));
         assertDoesNotThrow(()->orderService.delete(1L));
     }
 
     @Test
     void deleteNonexistentByIdTest(){
-        when(orderDao.retrieveById(anyLong())).thenReturn(Optional.empty());
+        when(orderDao.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(NoSuchEntityException.class, ()->orderService.delete(1L));
     }
 }

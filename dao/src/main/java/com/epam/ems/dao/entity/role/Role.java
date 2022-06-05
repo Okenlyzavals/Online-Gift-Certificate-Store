@@ -3,7 +3,9 @@ package com.epam.ems.dao.entity.role;
 import java.util.Arrays;
 
 public enum Role {
-    ADMIN(1L), USER(2L), LOCKED(3L);
+    ADMIN(1L),
+    USER(2L),
+    LOCKED(3L);
 
     final Long id;
 

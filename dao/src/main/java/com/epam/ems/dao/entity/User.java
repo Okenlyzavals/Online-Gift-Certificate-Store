@@ -1,7 +1,6 @@
 package com.epam.ems.dao.entity;
 
 import com.epam.ems.dao.audit.AuditEntityListener;
-import com.epam.ems.dao.constant.DBMetadata;
 import com.epam.ems.dao.entity.role.Role;
 import com.epam.ems.dao.entity.role.RoleConverter;
 import lombok.*;
@@ -11,6 +10,8 @@ import javax.persistence.*;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.epam.ems.dao.constant.DBMetadata.*;
+
 @Getter
 @Setter
 @ToString
@@ -19,26 +20,26 @@ import java.util.Set;
 @NoArgsConstructor
 
 @Entity
-@Table(name = DBMetadata.USER_TABLE)
+@Table(name = USER_TABLE)
 @EntityListeners(AuditEntityListener.class)
 public class User{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = DBMetadata.USER_TABLE_ID)
+    @Column(name = USER_TABLE_ID)
     private Long id;
 
-    @Column(name = DBMetadata.USER_TABLE_USERNAME)
+    @Column(name = USER_TABLE_USERNAME)
     private String username;
 
-    @Column(name = DBMetadata.USER_TABLE_EMAIL)
+    @Column(name = USER_TABLE_EMAIL)
     private String email;
 
-    @Column(name = DBMetadata.USER_TABLE_PASSWORD)
+    @Column(name = USER_TABLE_PASSWORD)
     private String password;
 
     @Convert(converter = RoleConverter.class)
-    @Column(name = "id_role")
+    @Column(name = USER_TABLE_ROLE_ID)
     private Role role;
 
     @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST},

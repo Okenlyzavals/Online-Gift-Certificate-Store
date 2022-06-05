@@ -8,19 +8,22 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
 @SpringBootApplication(scanBasePackages = {"com.epam.ems"})
 @EnableSpringDataWebSupport
-@EnableJpaRepositories("com.epam.ems.dao")
-@EntityScan("com.epam.ems.dao.entity")
+@EnableJpaRepositories("com.epam.ems")
+@EntityScan("com.epam.ems")
 @Component
 public class SpringBootApp {
 
     private final DatasourceFiller filler;
     private final Environment environment;
+    @Autowired
+    PasswordEncoder encoder;
 
     @Autowired
     public SpringBootApp(DatasourceFiller filler, Environment environment) {

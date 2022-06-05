@@ -23,6 +23,7 @@ public final class DBMetadata {
     public static final String USER_TABLE_EMAIL="email";
     public static final String USER_TABLE_PASSWORD="user_password";
     public static final String USER_TABLE_USERNAME="username";
+    public static final String USER_TABLE_ROLE_ID="id_role";
 
     public static final String ORDER_TABLE="orders";
     public static final String ORDER_TABLE_ID="id_orders";

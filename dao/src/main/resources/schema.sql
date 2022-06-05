@@ -2,8 +2,15 @@ DROP TABLE IF EXISTS certificate_has_tag;
 DROP TABLE IF EXISTS orders_has_certificates;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS roles;
 DROP TABLE IF EXISTS tag;
 DROP TABLE IF EXISTS gift_certificate;
+
+CREATE TABLE roles(
+    id_role bigint NOT NULL auto_increment,
+    role_name varchar(45) not null UNIQUE,
+    PRIMARY KEY (id_role)
+);
 
 CREATE TABLE gift_certificate (
   certificate_id bigint NOT NULL AUTO_INCREMENT,
@@ -21,7 +28,9 @@ CREATE TABLE users (
                        email varchar(255) DEFAULT NULL UNIQUE,
                        user_password varchar(255) DEFAULT NULL,
                        username varchar(255) DEFAULT NULL,
-                       PRIMARY KEY (id_users)
+                       id_role bigint not null,
+                       PRIMARY KEY (id_users),
+                       FOREIGN KEY (id_role) REFERENCES roles (id_role)
 );
 
 CREATE TABLE orders (
@@ -40,17 +49,17 @@ CREATE TABLE tag (
 );
 
 CREATE TABLE orders_has_certificates (
-                                         order_id bigint NOT NULL,
-                                         cert_id bigint NOT NULL,
-                                         PRIMARY KEY (order_id,cert_id),
-                                         FOREIGN KEY (cert_id) REFERENCES gift_certificate (certificate_id) ON DELETE CASCADE ,
-                                         FOREIGN KEY (order_id) REFERENCES orders (id_orders) ON DELETE CASCADE
+  order_id bigint NOT NULL,
+  cert_id bigint NOT NULL,
+  PRIMARY KEY (order_id,cert_id),
+  FOREIGN KEY (cert_id) REFERENCES gift_certificate (certificate_id) ON DELETE CASCADE ,
+  FOREIGN KEY (order_id) REFERENCES orders (id_orders) ON DELETE CASCADE
 );
 
 CREATE TABLE certificate_has_tag (
-                                     id_certificate bigint NOT NULL,
-                                     id_tag bigint NOT NULL,
-                                     PRIMARY KEY (id_certificate,id_tag),
-                                     FOREIGN KEY (id_certificate) REFERENCES gift_certificate (certificate_id) ON DELETE CASCADE ,
-                                     FOREIGN KEY (id_tag) REFERENCES tag (tag_id) ON DELETE CASCADE
+  id_certificate bigint NOT NULL,
+  id_tag bigint NOT NULL,
+  PRIMARY KEY (id_certificate,id_tag),
+  FOREIGN KEY (id_certificate) REFERENCES gift_certificate (certificate_id) ON DELETE CASCADE ,
+  FOREIGN KEY (id_tag) REFERENCES tag (tag_id) ON DELETE CASCADE
 );
