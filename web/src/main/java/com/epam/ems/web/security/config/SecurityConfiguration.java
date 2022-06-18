@@ -39,7 +39,9 @@ public class SecurityConfiguration {
                 .antMatchers(HttpMethod.GET, "/tags", "/certificates").anonymous()
                 .antMatchers(HttpMethod.GET, "/**").authenticated()
                 .antMatchers(HttpMethod.POST, "/orders/**").authenticated()
-                .anyRequest().hasRole("ADMIN");
+                .anyRequest().hasRole("ADMIN")
+                .and()
+                .exceptionHandling();
         return http.build();
     }
 

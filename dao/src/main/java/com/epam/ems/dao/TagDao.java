@@ -7,6 +7,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * Repository for {@link Tag} entity.
+ * @author Baranouski Y. K.
+ * @version 1.0.0
+ */
 @Repository
 public interface TagDao extends JpaRepository<Tag, Long> {
 
