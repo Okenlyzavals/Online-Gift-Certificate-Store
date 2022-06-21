@@ -33,7 +33,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class OrderServiceImplTest {
+class OrderServiceImplTest {
 
     @Spy
     OrderDtoMapper mapper = new OrderDtoMapper(new UserDtoMapper(), new GiftCertificateDtoMapper(new TagDtoMapper()));
@@ -82,7 +82,7 @@ public class OrderServiceImplTest {
                         GiftCertificate.builder().id(3L).build()))
                 .build());
         OrderDto expected = mapper.map(order.get());
-        when(orderDao.retrieveById(eq(1L))).thenReturn(order);
+        when(orderDao.retrieveById(anyLong())).thenReturn(order);
 
         OrderDto actual = orderService.getById(1L);
 
@@ -113,8 +113,8 @@ public class OrderServiceImplTest {
                                 GiftCertificate.builder().id(3L).build()))
                         .build());
         List<OrderDto> expected = orders.stream().map(mapper::map).collect(Collectors.toList());
-        when(userDao.retrieveById(anyLong())).thenReturn(Optional.of(User.builder().build()));
-        when(orderDao.retrieveByUserId(eq(1L),anyInt(),anyInt())).thenReturn(orders);
+        when(userDao.retrieveById(anyLong())).thenReturn(Optional.of(User.builder().id(1L).build()));
+        when(orderDao.retrieveByUserId(anyLong(),anyInt(),anyInt())).thenReturn(orders);
 
         List<OrderDto> actual = orderService.getOrdersByUser(1L,1,100);
 

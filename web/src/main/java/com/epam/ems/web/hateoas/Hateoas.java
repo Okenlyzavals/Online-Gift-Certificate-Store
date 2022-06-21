@@ -2,15 +2,13 @@ package com.epam.ems.web.hateoas;
 
 import com.epam.ems.service.dto.DataTransferObject;
 import com.epam.ems.web.hateoas.constant.HateoasConstant;
-import lombok.extern.java.Log;
+import com.epam.ems.web.hateoas.exception.HateoasException;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
@@ -34,8 +32,8 @@ public interface Hateoas<T extends RepresentationModel<? extends DataTransferObj
             prevPage = previousPageFuture.get();
             firstPage = firstPageFuture.get();
         } catch (InterruptedException | ExecutionException e) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, e.getMessage());
-            throw new RuntimeException(e);
+            Thread.currentThread().interrupt();
+            throw new HateoasException(e);
         }
 
         model.addIf(nextPage != null, ()->linkTo(nextPage).withRel(HateoasConstant.PAGE_NEXT));

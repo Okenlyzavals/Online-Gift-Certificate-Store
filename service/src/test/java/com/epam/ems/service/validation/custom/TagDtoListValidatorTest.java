@@ -8,7 +8,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TagDtoListValidatorTest {
+class TagDtoListValidatorTest {
     private final TagDtoListValidator validator = new TagDtoListValidator();
 
     @Test

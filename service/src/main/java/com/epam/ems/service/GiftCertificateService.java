@@ -2,6 +2,7 @@ package com.epam.ems.service;
 
 import com.epam.ems.service.dto.GiftCertificateDto;
 import com.epam.ems.service.exception.NoSuchEntityException;
+import com.epam.ems.service.exception.UpdateException;
 
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,8 @@ public interface GiftCertificateService extends AbstractService<GiftCertificateD
      * Updates given certificate in Data Source.
      * @param entity Entity to update, wrapped in {@link GiftCertificateDto}
      * @throws NoSuchEntityException if there is no such entity in Data Source.
+     * @throws UpdateException if an error has occurred during update process.
      */
-    GiftCertificateDto update(GiftCertificateDto entity) throws NoSuchEntityException;
+    GiftCertificateDto update(GiftCertificateDto entity) throws NoSuchEntityException, UpdateException;
 
 }

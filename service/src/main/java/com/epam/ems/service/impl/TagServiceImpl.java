@@ -8,7 +8,6 @@ import com.epam.ems.service.exception.DuplicateEntityException;
 import com.epam.ems.service.exception.NoSuchEntityException;
 import com.epam.ems.service.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,11 +58,13 @@ public class TagServiceImpl implements TagService {
     @Override
     @Transactional
     public void delete(Long id) throws NoSuchEntityException {
-        dao.retrieveById(id).orElseThrow(()->new NoSuchEntityException(Tag.class));
-        dao.delete(id);
+        dao.retrieveById(id).ifPresentOrElse(
+                e->dao.delete(id),
+                ()-> {throw new NoSuchEntityException(Tag.class);});
     }
 
     @Override
+    @Transactional
     public void delete(TagDto entity) throws NoSuchEntityException {
         delete(entity.getId());
     }

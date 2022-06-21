@@ -2,7 +2,6 @@ package com.epam.ems.dao.impl;
 
 import com.epam.ems.dao.OrderDao;
 import com.epam.ems.dao.entity.Order;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +44,8 @@ public class OrderDaoImpl implements OrderDao {
     @Transactional
     public Order create(Order entity) {
         manager.persist(entity);
+        manager.flush();
+        manager.refresh(entity);
         return entity;
     }
 

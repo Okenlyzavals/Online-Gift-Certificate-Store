@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -19,15 +20,24 @@ import javax.annotation.PostConstruct;
 @Component
 public class SpringBootApp {
 
+    private DatasourceFiller filler;
+    private Environment environment;
+
     @Autowired
-    public DatasourceFiller datasourceFiller;
+    public SpringBootApp(DatasourceFiller filler, Environment environment) {
+        this.filler = filler;
+        this.environment = environment;
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(SpringBootApp.class,args);
     }
 
     @PostConstruct
-    public void init() {
-        //datasourceFiller.fillDBWithData();
+    public void fillDataSource(){
+        if (Boolean.TRUE.equals(Boolean.valueOf(environment.getProperty("certificates.fillDB")))){
+            filler.fillSourceWithData();
+        }
     }
+
 }

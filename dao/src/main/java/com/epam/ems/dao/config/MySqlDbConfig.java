@@ -15,6 +15,7 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.util.Properties;
 
 @Configuration
@@ -41,7 +42,7 @@ public class MySqlDbConfig {
 
     @Bean
     @Profile("prod")
-    public DataSource mysqlDataSource() throws Exception {
+    public DataSource mysqlDataSource() {
         BasicDataSource dataSource = new BasicDataSource();
 
         dataSource.setDriverClassName(environment.getProperty(DATABASE_DRIVER_CLASS_NAME));
@@ -54,13 +55,13 @@ public class MySqlDbConfig {
 
     @Autowired
     @Bean(name = "sessionFactory")
-    public SessionFactory getSessionFactory(DataSource dataSource) throws Exception {
+    public SessionFactory getSessionFactory(DataSource dataSource) throws IOException {
         Properties properties = new Properties();
 
         properties.put("hibernate.dialect", environment.getProperty(DATABASE_HIBERNATE_DIALECT));
-        properties.put(DATABASE_SHOW_SQL, environment.getProperty(DATABASE_SHOW_SQL));
+        properties.put("hibernate.show_sql", environment.getProperty(DATABASE_SHOW_SQL));
         properties.put("hibernate.hbm2ddl.auto", environment.getProperty(DATABASE_DDL_AUTO));
-        properties.put(SESSION_CONTEXT_CLASS, environment.getProperty(SESSION_CONTEXT_CLASS));
+        properties.put("hibernate.current_session_context_class", environment.getProperty(SESSION_CONTEXT_CLASS));
 
         LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
         factoryBean.setPackagesToScan("");

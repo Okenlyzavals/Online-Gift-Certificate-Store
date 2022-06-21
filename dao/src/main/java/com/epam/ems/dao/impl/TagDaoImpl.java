@@ -2,7 +2,6 @@ package com.epam.ems.dao.impl;
 
 import com.epam.ems.dao.TagDao;
 import com.epam.ems.dao.entity.Tag;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
