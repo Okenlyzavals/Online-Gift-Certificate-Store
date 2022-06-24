@@ -11,6 +11,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,9 +39,9 @@ class TagServiceImplTest {
                 new Tag(2L,"Tag0",null), new Tag(3L, "TAG",null));
         List<TagDto> expected = taglist.stream().map(e->new TagDto(e.getId(), e.getName())).collect(Collectors.toList());
 
-        when(dao.retrieveAll(anyInt(),anyInt())).thenReturn(taglist);
+        when(dao.findAll((Pageable) any())).thenReturn(new PageImpl<>(taglist));
         when(mapper.map(any())).thenCallRealMethod();
-        List<TagDto> actual = service.getAll(5,5);
+        List<TagDto> actual = service.getAll(5,5).toList();
 
         assertEquals(expected, actual);
 
@@ -49,7 +52,7 @@ class TagServiceImplTest {
         Tag toReturn = new Tag(15L,"got it",null);
         TagDto expected = new TagDto(15L,"got it");
 
-        when(dao.retrieveById(15L)).thenReturn(Optional.of(toReturn));
+        when(dao.findById(15L)).thenReturn(Optional.of(toReturn));
         when(mapper.map(any())).thenCallRealMethod();
         TagDto actual = service.getById(15L);
 
@@ -58,7 +61,7 @@ class TagServiceImplTest {
 
     @Test
     void testGetByIncorrectId(){
-        when(dao.retrieveById(anyLong())).thenReturn(Optional.empty());
+        when(dao.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(NoSuchEntityException.class, ()->service.getById(1L));
     }
 
@@ -67,7 +70,7 @@ class TagServiceImplTest {
         Tag toReturn = new Tag(15L,"this  name",null);
         TagDto expected = new TagDto(15L,"this  name");
 
-        when(dao.findByName("this name")).thenReturn(Optional.of(toReturn));
+        when(dao.findDistinctByName("this name")).thenReturn(Optional.of(toReturn));
         when(mapper.map(any())).thenCallRealMethod();
         TagDto actual = service.getByName("this name");
 
@@ -77,14 +80,14 @@ class TagServiceImplTest {
 
     @Test
     void testGetByIncorrectName(){
-        when(dao.findByName(any())).thenReturn(Optional.empty());
+        when(dao.findDistinctByName(any())).thenReturn(Optional.empty());
         assertThrows(NoSuchEntityException.class, ()->service.getByName("that name"));
     }
 
     @Test
     void testInsertNewEntity(){
         TagDto toCreate = new TagDto(13L,"Like a man is the mountainside");
-        when(dao.create(any())).thenReturn(new Tag());
+        when(dao.save(any())).thenReturn(new Tag());
 
         assertDoesNotThrow(()->service.insert(toCreate));
     }
@@ -92,32 +95,32 @@ class TagServiceImplTest {
     @Test
     void testInsertDuplicateEntity(){
         TagDto duplicate = new TagDto(13L,"Like a man is the mountainside");
-        when(dao.findByName(anyString())).thenReturn(Optional.of(Tag.builder().id(1L).build()));
+        when(dao.findDistinctByName(anyString())).thenReturn(Optional.of(Tag.builder().id(1L).build()));
 
         assertThrows(DuplicateEntityException.class, ()->service.insert(duplicate));
     }
 
     @Test
     void testDeleteByExistingId(){
-        when(dao.retrieveById(anyLong())).thenReturn(Optional.of(Tag.builder().build()));
+        when(dao.findById(anyLong())).thenReturn(Optional.of(Tag.builder().build()));
         assertDoesNotThrow(()->service.delete(1L));
     }
 
     @Test
     void testDeleteByMissingId(){
-        when(dao.retrieveById(anyLong())).thenReturn(Optional.empty());
+        when(dao.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(NoSuchEntityException.class, ()->service.delete(1L));
     }
 
     @Test
     void testDeleteExistingEntity(){
-        when(dao.retrieveById(anyLong())).thenReturn(Optional.of(Tag.builder().build()));
+        when(dao.findById(anyLong())).thenReturn(Optional.of(Tag.builder().build()));
         assertDoesNotThrow(()->service.delete(new TagDto(1L,"")));
     }
 
     @Test
     void testDeleteMissingEntity(){
-        when(dao.retrieveById(anyLong())).thenReturn(Optional.empty());
+        when(dao.findById(anyLong())).thenReturn(Optional.empty());
         TagDto toDelete = new TagDto(1L,"del");
         assertThrows(NoSuchEntityException.class, ()->service.delete(toDelete));
     }

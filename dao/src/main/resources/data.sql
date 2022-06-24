@@ -1,3 +1,5 @@
+INSERT INTO roles VALUES (DEFAULT, 'ADMIN'),(DEFAULT, 'USER'),(DEFAULT, 'LOCKED');
+
 INSERT INTO tag VALUES (DEFAULT ,'clammish'),(DEFAULT,'subproofs'),
                        (DEFAULT,'gesticulacious'),
                        (DEFAULT,'inadjustability'),(DEFAULT,'curryfavour'),
@@ -5,10 +7,10 @@ INSERT INTO tag VALUES (DEFAULT ,'clammish'),(DEFAULT,'subproofs'),
                        (DEFAULT,'twin-tractor'),(DEFAULT,'endomysium'),
                        (DEFAULT,'murthering');
 
-INSERT INTO users VALUES (DEFAULT,'awakable@epam.test.com','garmentworker','awakable'),
-                         (DEFAULT,'buddles@epam.test.com','preshows','buddles'),
-                         (DEFAULT,'Euploeinae@epam.test.com','adiaphorism','Euploeinae'),
-                         (DEFAULT,'devocate@epam.test.com','unhidden','devocate');
+INSERT INTO users VALUES (DEFAULT,'awakable@epam.test.com','garmentworker','awakable',2),
+                         (DEFAULT,'buddles@epam.test.com','preshows','buddles',2),
+                         (DEFAULT,'Euploeinae@epam.test.com','adiaphorism','Euploeinae',2),
+                         (DEFAULT,'devocate@epam.test.com','unhidden','devocate',1);
 
 INSERT INTO gift_certificate VALUES (DEFAULT,'2022-03-08 15:33:15.000000','hooker-out Blase self-abhorring pseudotropine axemaster testing archdeceiver outsetting orientating',11,'2022-05-22 16:16:01.557016','fanwise tornado-swept certificate',1690.83),
                                     (DEFAULT,'2022-04-14 16:56:02.000000','Lymantriidae shacklebone hematozzoa didactive glorification biochemically analabos anecdotist',56,'2022-05-22 16:16:01.567089','dimethylanthranilate Hentrich certificate',4400.86);

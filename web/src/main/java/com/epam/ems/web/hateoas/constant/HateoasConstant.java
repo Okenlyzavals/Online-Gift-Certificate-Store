@@ -21,5 +21,7 @@ public final class HateoasConstant {
 
     public static final String ALL_USERS = "allUsers";
 
+    public static final String USER = "user";
+
     private HateoasConstant(){}
 }

@@ -12,13 +12,13 @@ class OrderDtoUserValidatorTest {
 
     @Test
     void validUserTest(){
-        UserDto valid = new UserDto(1L,"john","john@son.us","johnson1");
+        UserDto valid = new UserDto(1L,"john","john@son.us","johnson1", UserDto.Role.USER);
         assertTrue(validator.isValid(valid, null));
     }
 
     @Test
     void invalidUserTest(){
-        UserDto invalid = new UserDto(-1L,"john","john@son.us","johnson1");
+        UserDto invalid = new UserDto(-1L,"john","john@son.us","johnson1",UserDto.Role.ADMIN);
         assertFalse(validator.isValid(invalid, null));
     }
 

@@ -36,6 +36,7 @@ public class Order{
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
     @JoinColumn(name = DBMetadata.ORDER_TABLE_USER, referencedColumnName = DBMetadata.USER_TABLE_ID)
+    @ToString.Exclude
     private User user;
 
     @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
@@ -46,13 +47,6 @@ public class Order{
     )
     @ToString.Exclude
     private Set<GiftCertificate> certificates;
-
-    @PrePersist
-    public void onPrePersist(){
-        if (price == null){
-            price = new BigDecimal("0.000");
-        }
-    }
 
     @Override
     public boolean equals(Object o) {

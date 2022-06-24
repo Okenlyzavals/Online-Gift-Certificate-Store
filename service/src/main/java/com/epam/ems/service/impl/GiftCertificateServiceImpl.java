@@ -4,7 +4,7 @@ import com.epam.ems.dao.GiftCertificateDao;
 import com.epam.ems.dao.TagDao;
 import com.epam.ems.dao.entity.GiftCertificate;
 import com.epam.ems.dao.entity.Tag;
-import com.epam.ems.dao.entity.criteria.Criteria;
+import com.epam.ems.dao.entity.criteria.CertificateCriteria;
 import com.epam.ems.service.GiftCertificateService;
 import com.epam.ems.service.dto.GiftCertificateDto;
 import com.epam.ems.service.exception.NoSuchEntityException;
@@ -12,6 +12,7 @@ import com.epam.ems.service.exception.UpdateException;
 import com.epam.ems.service.mapper.Mapper;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -39,16 +40,18 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Override
     public GiftCertificateDto getById(Long id) throws NoSuchEntityException {
         return mapper.map(
-                dao.retrieveById(id)
+                dao.findById(id)
                 .orElseThrow(()->new NoSuchEntityException(GiftCertificate.class)));
     }
 
     @Override
-    public List<GiftCertificateDto> getAll(int page, int elements) {
-        return dao.retrieveAll(page,elements)
-                .stream()
-                .map(mapper::map)
-                .collect(Collectors.toList());
+    public Page<GiftCertificateDto> getAll(int page, int elements) {
+        Pageable request = PageRequest.of(page,elements);
+        Page<GiftCertificate> result =  dao.findAll(request);
+        return new PageImpl<>(
+                result.stream().map(mapper::map).collect(Collectors.toList()),
+                request,
+                result.getTotalElements());
     }
 
     @Override
@@ -59,13 +62,13 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         GiftCertificate toCreate = mapper.extract(entity);
         toCreate.setTags(getTagsPreparedForDbOperations(toCreate));
 
-        return mapper.map(dao.create(toCreate));
+        return mapper.map(dao.save(toCreate));
     }
 
     @Override
     public void delete(Long id) throws NoSuchEntityException {
-        dao.retrieveById(id).ifPresentOrElse(
-                e->dao.delete(id),
+        dao.findById(id).ifPresentOrElse(
+                dao::delete,
                 ()-> {throw new NoSuchEntityException(GiftCertificate.class);});
     }
 
@@ -75,24 +78,27 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificateDto> getByCriteria(Map<String,Object> criteria, int page, int elements) {
-        return dao.retrieveByCriteria(mapToCriteria(criteria),page,elements)
-                .stream()
-                .map(mapper::map)
-                .collect(Collectors.toList());
+    public Page<GiftCertificateDto> getByCriteria(Map<String,Object> criteria, int page, int elements) {
+
+        Pageable request = PageRequest.of(page,elements);
+        Page<GiftCertificate> result =  dao.retrieveByCriteria(mapToCriteria(criteria), request);
+        return new PageImpl<>(
+                result.stream().map(mapper::map).collect(Collectors.toList()),
+                request,
+                result.getTotalElements());
     }
 
     @Override
     public GiftCertificateDto update(GiftCertificateDto entity) throws NoSuchEntityException {
 
-        GiftCertificate oldCert = dao.retrieveById(entity.getId())
+        GiftCertificate oldCert = dao.findById(entity.getId())
                 .orElseThrow(()->new NoSuchEntityException(GiftCertificate.class));
 
         entity.setLastUpdateDate(LocalDateTime.now());
         GiftCertificate toUpdate = getUpdatedCertificate(oldCert, mapper.extract(entity));
         toUpdate.setTags(getTagsPreparedForDbOperations(toUpdate));
 
-        return mapper.map(dao.update(toUpdate));
+        return mapper.map(dao.save(toUpdate));
     }
 
     private Set<Tag> getTagsPreparedForDbOperations(GiftCertificate certificate){
@@ -101,11 +107,11 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             Set<Tag> preparedTags = new HashSet<>();
 
             for(Tag tag : currentTags){
-                Optional<Tag> tagFromDb = tagDao.findByName(tag.getName()).or(()-> {
+                Optional<Tag> tagFromDb = tagDao.findDistinctByName(tag.getName()).or(()-> {
                     if(tag.getId() == null){
                         return Optional.empty();
                     }
-                    return tagDao.retrieveById(tag.getId());
+                    return tagDao.findById(tag.getId());
                 });
                 tagFromDb.ifPresentOrElse(
                         preparedTags::add,
@@ -116,19 +122,19 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         return currentTags;
     }
 
-    private Criteria mapToCriteria(Map<String,Object> map){
+    private CertificateCriteria mapToCriteria(Map<String,Object> map){
 
-        List<String> paramNames = Arrays.stream(Criteria.ParamName.values())
+        List<String> paramNames = Arrays.stream(CertificateCriteria.ParamName.values())
                 .map(Enum::name).collect(Collectors.toList());
 
-        Criteria criteria = new Criteria();
+        CertificateCriteria criteria = new CertificateCriteria();
         if(map == null){
             return criteria;
         }
 
         map.entrySet().stream()
                 .filter(e->paramNames.contains(e.getKey()))
-                .forEach(e-> criteria.put(Criteria.ParamName.valueOf(e.getKey()), e.getValue()));
+                .forEach(e-> criteria.put(CertificateCriteria.ParamName.valueOf(e.getKey()), e.getValue()));
 
         return criteria;
     }

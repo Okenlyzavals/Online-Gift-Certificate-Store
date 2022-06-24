@@ -2,8 +2,7 @@ package com.epam.ems.service;
 
 import com.epam.ems.service.dto.OrderDto;
 import com.epam.ems.service.exception.NoSuchEntityException;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 /**
  * Interface extending {@link AbstractService}, suited for use with
@@ -24,6 +23,6 @@ public interface OrderService extends AbstractService<OrderDto> {
      * that were made by user with given ID.
      * @throws NoSuchEntityException If there is no user with such ID.
      */
-    List<OrderDto> getOrdersByUser(Long id, int page, int elements) throws NoSuchEntityException;
+    Page<OrderDto> getOrdersByUser(Long id, int page, int elements) throws NoSuchEntityException;
 
 }

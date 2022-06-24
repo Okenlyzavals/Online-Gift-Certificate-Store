@@ -6,10 +6,17 @@ import com.epam.ems.dao.entity.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,10 +28,11 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {TagDaoImpl.class, TestDbConfig.class}, loader = AnnotationConfigContextLoader.class)
-@ActiveProfiles("dev")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@SpringBootTest
+@ContextConfiguration(
+        classes = {TestDbConfig.class},
+        loader = AnnotationConfigContextLoader.class)
+@DataJpaTest
+@EntityScan(basePackages = "com.epam.ems.*")
 class TagDaoTest {
 
     @Autowired
@@ -44,7 +52,7 @@ class TagDaoTest {
                 new Tag(9L,"endomysium", null),
                 new Tag(10L,"murthering", null)
         );
-        List<Tag> actualTags = dao.retrieveAll(1,10);
+        List<Tag> actualTags = dao.findAll(PageRequest.of(0,10)).toList();
 
         assertTrue(expectedTags.size() == actualTags.size()
                 && expectedTags.containsAll(actualTags)
@@ -55,14 +63,14 @@ class TagDaoTest {
     @Test
     void testGetByExistingId(){
         Optional<Tag> expected = Optional.of(new Tag(1L,"clammish",null));
-        Optional<Tag> actual = dao.retrieveById(1L);
+        Optional<Tag> actual = dao.findById(1L);
 
         assertEquals(expected,actual);
     }
     @Test
     void testGetByNonExistingId(){
         Optional<Tag> expected = Optional.empty();
-        Optional<Tag> actual = dao.retrieveById(-5L);
+        Optional<Tag> actual = dao.findById(-5L);
 
         assertEquals(expected,actual);
     }
@@ -71,7 +79,7 @@ class TagDaoTest {
     void testGetByExistingName(){
 
         Optional<Tag> expected = Optional.of(new Tag(1L,"clammish",null));
-        Optional<Tag> actual = dao.findByName("clammish");
+        Optional<Tag> actual = dao.findDistinctByName("clammish");
 
         assertEquals(expected,actual);
     }
@@ -80,7 +88,7 @@ class TagDaoTest {
     @Test
     void testGetByNotExistingName(){
         Optional<Tag> expected = Optional.empty();
-        Optional<Tag> actual = dao.findByName("Cooks");
+        Optional<Tag> actual = dao.findDistinctByName("Cooks");
 
         assertEquals(expected,actual);
     }
@@ -90,7 +98,7 @@ class TagDaoTest {
     void testCreateNewTag(){
         Tag expected = new Tag(null,"testing", null);
 
-        Tag actual = dao.create(expected);
+        Tag actual = dao.save(expected);
         expected.setId(11L);
 
         assertEquals(expected, actual);
@@ -100,7 +108,7 @@ class TagDaoTest {
     void testCreateDuplicateTag(){
         Tag duplicate = new Tag(null,"clammish", null);
 
-        assertThrows(PersistenceException.class, ()->dao.create(duplicate));
+        assertThrows(DataIntegrityViolationException.class, ()->dao.save(duplicate));
     }
 
 
@@ -108,8 +116,8 @@ class TagDaoTest {
     void testDeleteByCorrectId(){
         Tag toDelete = new Tag(1L,"clammish",null);
 
-        dao.delete(toDelete.getId());
-        Optional<Tag> actual = dao.retrieveById(toDelete.getId());
+        dao.deleteById(toDelete.getId());
+        Optional<Tag> actual = dao.findById(toDelete.getId());
 
         assertTrue(actual.isEmpty());
 
@@ -119,6 +127,6 @@ class TagDaoTest {
     void testDeleteByIncorrectId(){
         long deletionId = -12024L;
 
-        assertThrows(IllegalArgumentException.class, ()->dao.delete(deletionId));
+        assertThrows(EmptyResultDataAccessException.class, ()->dao.deleteById(deletionId));
     }
 }

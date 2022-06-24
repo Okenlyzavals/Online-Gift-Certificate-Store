@@ -15,6 +15,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,9 +58,9 @@ class GiftCertificateServiceImplTest {
                                 .collect(Collectors.toSet())))
                 .collect(Collectors.toList());
 
-        when(dao.retrieveAll(anyInt(),anyInt())).thenReturn(certificateList);
+        when(dao.findAll((Pageable) any())).thenReturn(new PageImpl<>(certificateList));
 
-        List<GiftCertificateDto> actual = service.getAll(5,5);
+        List<GiftCertificateDto> actual = service.getAll(5,5).toList();
         assertEquals(expected, actual);
     }
 
@@ -65,7 +68,7 @@ class GiftCertificateServiceImplTest {
     void testGetByCorrectId(){
         GiftCertificateDto expected = new GiftCertificateDto(15L, "cert", null,null,null,null,null,null);
 
-        when(dao.retrieveById(15L)).thenReturn(Optional.of(GiftCertificate.builder().id(15L).name("cert").build()));
+        when(dao.findById(15L)).thenReturn(Optional.of(GiftCertificate.builder().id(15L).name("cert").build()));
 
         GiftCertificateDto actual = service.getById(15L);
         assertEquals(expected, actual);
@@ -73,13 +76,13 @@ class GiftCertificateServiceImplTest {
 
     @Test
     void testGetByIncorrectId(){
-        when(dao.retrieveById(anyLong())).thenReturn(Optional.empty());
+        when(dao.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(NoSuchEntityException.class, ()->service.getById(15L));
     }
 
     @Test
     void testInsertNewEntityWithoutTags(){
-        when(dao.create(any())).thenReturn(null);
+        when(dao.save(any())).thenReturn(null);
         assertDoesNotThrow(()->service.insert(new GiftCertificateDto()));
     }
 
@@ -88,20 +91,20 @@ class GiftCertificateServiceImplTest {
         GiftCertificateDto toInsert = new GiftCertificateDto();
         toInsert.setTags(Set.of(new TagDto(null,"tag"), new TagDto(2L,"tug")));
 
-        when(dao.create(any())).thenReturn(null);
+        when(dao.save(any())).thenReturn(null);
 
         assertDoesNotThrow(()->service.insert(toInsert));
     }
 
     @Test
     void testDeleteByExistingId(){
-        when(dao.retrieveById(anyLong())).thenReturn(Optional.of(GiftCertificate.builder().build()));
+        when(dao.findById(anyLong())).thenReturn(Optional.of(GiftCertificate.builder().build()));
         assertDoesNotThrow(()->service.delete(1L));
     }
 
     @Test
     void testDeleteByMissingId(){
-        when(dao.retrieveById(anyLong())).thenReturn(Optional.empty());
+        when(dao.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(NoSuchEntityException.class, ()->service.delete(1L));
     }
 
@@ -110,7 +113,7 @@ class GiftCertificateServiceImplTest {
         GiftCertificateDto toDelete = new GiftCertificateDto();
         toDelete.setId(1L);
 
-        when(dao.retrieveById(anyLong())).thenReturn(Optional.of(GiftCertificate.builder().build()));
+        when(dao.findById(anyLong())).thenReturn(Optional.of(GiftCertificate.builder().build()));
 
         assertDoesNotThrow(()->service.delete(toDelete));
     }
@@ -120,7 +123,7 @@ class GiftCertificateServiceImplTest {
         GiftCertificateDto toDelete = new GiftCertificateDto();
         toDelete.setId(1L);
 
-        when(dao.retrieveById(anyLong())).thenReturn(Optional.empty());
+        when(dao.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(NoSuchEntityException.class, ()->service.delete(toDelete));
     }
@@ -132,9 +135,9 @@ class GiftCertificateServiceImplTest {
         criteria.put("TAG_NAME","tag");
         List<GiftCertificateDto> expected = List.of(new GiftCertificateDto());
 
-        when(dao.retrieveByCriteria(any(),anyInt(),anyInt())).thenReturn(List.of(GiftCertificate.builder().build()));
+        when(dao.retrieveByCriteria(any(), any())).thenReturn(new PageImpl<>(List.of(GiftCertificate.builder().build())));
 
-        assertEquals(expected, service.getByCriteria(criteria,1,1));
+        assertEquals(expected, service.getByCriteria(criteria,1,1).toList());
     }
 
     @Test
@@ -142,7 +145,7 @@ class GiftCertificateServiceImplTest {
         GiftCertificateDto toUpdate = new GiftCertificateDto();
         toUpdate.setId(1L);
 
-        when(dao.retrieveById(anyLong())).thenReturn(Optional.empty());
+        when(dao.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(NoSuchEntityException.class, ()->service.update(toUpdate));
     }
 
@@ -153,7 +156,7 @@ class GiftCertificateServiceImplTest {
         toUpdate.setId(1L);
         toUpdate.setTags(Set.of(new TagDto(null,"tag"), new TagDto(2L,"tug")));
 
-        when(dao.retrieveById(anyLong())).thenReturn(Optional.of(GiftCertificate.builder().build()));
+        when(dao.findById(anyLong())).thenReturn(Optional.of(GiftCertificate.builder().build()));
 
         assertDoesNotThrow(()->service.update(toUpdate));
     }
