@@ -40,7 +40,7 @@ public class UserDto extends RepresentationModel<UserDto>
     @Length(min = 8, max = 256, message = "msg.user.pass.wrong.len")
     private String password;
 
-    @Null
+    @Null(message = "msg.user.role.not.null")
     private Role role;
 
     @Override

@@ -46,7 +46,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<OrderDto> getAll(int page, int elements) {
-        Pageable request = PageRequest.of(page,elements, Sort.by(Sort.Direction.ASC, "id"));
+        Pageable request = PageRequest.of(page,elements);
         Page<Order> result =  dao.findAll(request);
         return new PageImpl<>(
                 result.stream().map(mapper::map).collect(Collectors.toList()),
@@ -85,7 +85,7 @@ public class OrderServiceImpl implements OrderService {
 
         User user =  userDao.findById(id).orElseThrow(()->new NoSuchEntityException(User.class));
 
-        Pageable request = PageRequest.of(page,elements, Sort.by(Sort.Direction.ASC, "id"));
+        Pageable request = PageRequest.of(page,elements);
         Page<Order> result =  dao.findAllByUserId(user.getId(), request);
         return new PageImpl<>(
                 result.stream().map(mapper::map).collect(Collectors.toList()),

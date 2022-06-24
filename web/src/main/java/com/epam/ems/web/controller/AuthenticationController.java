@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
 
 @RestController
@@ -52,14 +53,6 @@ public class AuthenticationController {
     public String register(@RequestBody @Valid UserDto userDto) {
         userDto.setPassword(encoder.encode(userDto.getPassword()));
         userService.insert(userDto);
-
-        Authentication authentication;
-        authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        userDto.getUsername(),
-                        userDto.getPassword()));
-
-        return jwtProvider.generateToken((UserDetails) authentication.getPrincipal());
+        return jwtProvider.generateToken(userDto);
     }
-
 }

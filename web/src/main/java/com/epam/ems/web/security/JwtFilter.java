@@ -26,17 +26,27 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain chain)
             throws ServletException, IOException {
         final String authorizationHeader = request.getHeader("Authorization");
-        String username = null;
+        String jwt = getJwt(authorizationHeader);
+        String username = jwt != null ? provider.extractUsername(jwt) : null;
+
+        setAuth(username, jwt);
+        chain.doFilter(request, response);
+    }
+
+    private String getJwt(String authorisationHeader){
         String jwt = null;
-
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7);
-            username = provider.extractUsername(jwt);
+        if (authorisationHeader != null && authorisationHeader.startsWith("Bearer ")) {
+            jwt = authorisationHeader.substring(7);
         }
+        return jwt;
+    }
 
+    private void setAuth(String username, String jwt){
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             String commaSeparatedListOfAuthorities = provider.extractAuthorities(jwt);
             List<GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(commaSeparatedListOfAuthorities);
@@ -45,6 +55,5 @@ public class JwtFilter extends OncePerRequestFilter {
                             username, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         }
-        chain.doFilter(request, response);
     }
 }

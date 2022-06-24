@@ -37,7 +37,7 @@ public class UserServiceImpl
 
     @Override
     public Page<UserDto> getAll(int page, int elements) {
-        Pageable request = PageRequest.of(page,elements, Sort.by(Sort.Direction.ASC, "id"));
+        Pageable request = PageRequest.of(page,elements);
         Page<User> result =  dao.findAll(request);
         return new PageImpl<>(
                 result.stream().map(mapper::map).collect(Collectors.toList()),
