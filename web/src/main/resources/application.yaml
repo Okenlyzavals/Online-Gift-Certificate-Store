@@ -1,0 +1,30 @@
+logging:
+  file:
+    name: ./log/certificates.log
+certificates:
+  fillDB: 'false'
+spring:
+  jpa:
+    properties:
+      hibernate:
+        current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
+    show-sql: 'false'
+    hibernate:
+      ddl-auto: validate
+    open-in-view: 'false'
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+  profiles:
+    active: prod
+  datasource:
+    password: '87654321'
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    url: jdbc:mysql://localhost:3306/task2certificates?allowMultiQueries=true
+jwt:
+  secret: test-epam-secret-key
+  sessionTime: '1800000'
+server:
+  servlet:
+    application-display-name: application
+    context-path: /
+  port: '8081'
