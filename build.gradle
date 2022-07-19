@@ -1,11 +1,25 @@
 plugins{
     id 'java'
+    id 'war'
     id 'org.springframework.boot' version '2.7.0'
+    id "org.sonarqube" version "3.4.0.2513"
+}
+
+war.archiveName('cert-system.war')
+
+dependencies {
+    implementation project(':dao')
+    implementation project(':service')
+    implementation project(':web')
+    providedRuntime group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat', version: '2.7.0'
 }
 
 allprojects {
 
-    apply plugin:'java'
+    apply plugin: 'java'
+    apply plugin: 'war'
+    apply plugin: 'org.sonarqube'
+    apply plugin: 'org.springframework.boot'
     group 'com.epam.ems'
     version '1.0.0'
 
@@ -25,6 +39,7 @@ allprojects {
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 
         implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
+        providedRuntime group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat', version: '2.7.0'
         annotationProcessor 'org.projectlombok:lombok:1.18.24'
     }
 

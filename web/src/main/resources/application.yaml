@@ -19,7 +19,7 @@ spring:
     password: '87654321'
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    url: jdbc:mysql://localhost:3306/task2certificates?allowMultiQueries=true
+    url: jdbc:mysql://127.0.0.1:3306/task2certificates?allowMultiQueries=true&useSSL=false
 jwt:
   secret: test-epam-secret-key
   sessionTime: '1800000'
