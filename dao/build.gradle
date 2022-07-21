@@ -1,3 +1,11 @@
+bootJar{
+    enabled = false
+}
+
+bootWar{
+    enabled=false
+}
+
 dependencies {
     implementation group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
@@ -16,6 +24,4 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.7.0'
     implementation group: 'org.springframework.data', name: 'spring-data-jpa', version: '2.7.0'
     implementation group: 'org.threeten', name: 'threetenbp', version: '1.6.0'
-
-
 }

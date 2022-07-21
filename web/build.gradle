@@ -1,5 +1,4 @@
 plugins {
-    id 'war'
     id 'application'
 }
 

@@ -25,9 +25,8 @@ public class CertificateCriteria extends LinkedHashMap<CertificateCriteria.Param
                 && containsKey(ParamName.ORDER_DATE_DESC)){
             remove(ParamName.ORDER_DATE_DESC);
         }
-
         if(key == ParamName.ORDER_NAME_DESC
-                && containsKey(ParamName.ORDER_DATE_ASC)){
+                && containsKey(ParamName.ORDER_NAME_ASC)){
             remove(ParamName.ORDER_NAME_ASC);
         }
         if(key == ParamName.ORDER_NAME_ASC

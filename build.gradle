@@ -1,11 +1,20 @@
 plugins{
     id 'java'
     id 'war'
+    id 'application'
+    id 'jacoco'
     id 'org.springframework.boot' version '2.7.0'
     id "org.sonarqube" version "3.4.0.2513"
 }
 
 war.archiveName('cert-system.war')
+springBoot{
+    mainClass = "com.epam.ems.web.SpringBootApp"
+}
+
+tasks.named('sonarqube').configure {
+    dependsOn test
+}
 
 dependencies {
     implementation project(':dao')
@@ -19,6 +28,7 @@ allprojects {
     apply plugin: 'java'
     apply plugin: 'war'
     apply plugin: 'org.sonarqube'
+    apply plugin: 'jacoco'
     apply plugin: 'org.springframework.boot'
     group 'com.epam.ems'
     version '1.0.0'
@@ -44,7 +54,15 @@ allprojects {
     }
 
     test {
+        finalizedBy jacocoTestReport
         useJUnitPlatform()
-        maxParallelForks=6
+        maxParallelForks=2
+    }
+
+    jacocoTestReport {
+        dependsOn test
+        reports {
+            xml.enabled true
+        }
     }
 }
