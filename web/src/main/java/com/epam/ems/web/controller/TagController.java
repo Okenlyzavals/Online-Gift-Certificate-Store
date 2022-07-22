@@ -52,6 +52,7 @@ public class TagController {
     public TagDto getTagById(
             @PathVariable("id") @Min(value = 1, message = "msg.id.negative") long id)
             throws NoSuchEntityException {
+        System.out.println("Tag id is: " + id);
         return hateoas.toModel(tagService.getById(id));
     }
 
